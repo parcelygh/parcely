@@ -7,7 +7,7 @@ export { createClient } from './client.js';
 
 // Errors (value + type re-exports)
 export { HttpError, isHttpError } from './errors.js';
-export type { HttpErrorCode, HttpErrorOptions } from './errors.js';
+export type { HttpErrorCode, HttpErrorOptions, HttpErrorJSON } from './errors.js';
 
 // Types (re-exported as type-only)
 export type {
@@ -18,6 +18,7 @@ export type {
   ResponseType,
   StandardSchemaV1,
   Validator,
+  ValidatorOutput,
   RequestConfig,
   HttpResponse,
   InterceptorHandler,

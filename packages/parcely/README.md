@@ -41,6 +41,7 @@ try {
 ## Features
 
 - **Zero runtime dependencies.** Global `fetch`. On Node, `undici` as an `optionalDependency` only for TLS customization.
+- **ESM-only.** No CJS build. Use dynamic `import()` from CommonJS or set `"type": "module"` in your `package.json`.
 - **Axios ergonomics.** `createClient`, method sugar, interceptors, envelope responses.
 - **Tree-shakeable.** `sideEffects: false`, named exports, small modules — import only `HttpError` and you get ~0.4 kB.
 - **Universal.** Browsers, Node 20+, Bun, Deno.

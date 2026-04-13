@@ -21,6 +21,7 @@ try {
 - **Zero runtime dependencies.** Built on global `fetch`. Undici pulls in only when TLS overrides are used, as an `optionalDependency`.
 - **Tree-shakeable.** Named exports, `sideEffects: false`, small focused modules. A consumer importing only `HttpError` ends up with ~0.4 kB of code.
 - **Universal.** Modern browsers, Node 20+, Bun, Deno.
+- **ESM-only.** Each package's `exports` map declares `"import"` only. CommonJS consumers can use dynamic `import()` or set `"type": "module"` in `package.json` — see [the installation guide](./website/docs/installation.mdx) for details.
 - **Axios-like API.** `createClient`, method sugar (`get/post/put/patch/delete`), `interceptors.{request,response}`, envelope responses `{ data, status, headers, config }`.
 - **Secure-by-default.** 13 baked-in defenses against the classes of bugs that have produced axios CVEs — SSRF via absolute-URL override, cross-origin redirect header leakage, prototype-pollution-safe merging, CRLF header injection, content-type-aware JSON parsing, and more.
 - **Runtime validation extension point.** Pass any Standard-Schema validator (Zod, Valibot, ArkType, Effect-Schema) or a plain `(input) => T` function.

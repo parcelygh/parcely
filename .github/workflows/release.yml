@@ -13,9 +13,12 @@ jobs:
   release:
     name: release
     runs-on: ubuntu-latest
-    # Only run on the canonical repo (skip on forks) and skip release-PR commits
-    # themselves to avoid loops.
-    if: github.repository == 'OWNER/parcely'
+    # Skip on forks — GitHub already prevents secrets from flowing to forked
+    # PRs on pull_request events, but for the canonical push-on-main trigger
+    # we also want to avoid running if someone has forked the repo and
+    # pushed to their own main. `fork == false` covers both cases cleanly
+    # and does not hardcode an org/repo slug.
+    if: github.event.repository.fork == false
     permissions:
       contents: write
       pull-requests: write

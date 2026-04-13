@@ -1,0 +1,55 @@
+name: Bug report
+description: Something in parcely doesn't behave as documented
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. A minimal reproduction is worth a thousand words — the more self-contained it is, the faster we can help.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A short, concrete description of the bug. Include the actual vs expected behaviour.
+      placeholder: |
+        I called `http.get('/u', { validate: UserSchema })` and expected `data` to be narrowed to `User`, but got `unknown`.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: A minimal snippet or a link to a repository / codesandbox. Please strip external dependencies and irrelevant code.
+      render: ts
+      placeholder: |
+        import { createClient } from 'parcely'
+        const http = createClient({ baseURL: 'https://example.com' })
+        // ...
+    validations:
+      required: true
+
+  - type: input
+    id: parcely-version
+    attributes:
+      label: parcely version
+      description: Output of `npm ls parcely` or equivalent.
+      placeholder: "0.2.0"
+    validations:
+      required: true
+
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime
+      description: Node version, browser, Bun, Deno. Include the version.
+      placeholder: "Node 22.14.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Logs, stack traces, relevant bits of code. If you've identified a root cause or potential fix, share it here.

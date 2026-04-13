@@ -20,8 +20,30 @@ class HttpError extends Error {
   readonly config: RequestConfig
   readonly response: HttpResponse<unknown> | undefined
   readonly cause: unknown
+
+  /** JSON-safe serialisation for structured logging. See below. */
+  toJSON(): HttpErrorJSON
 }
 ```
+
+## `HttpErrorJSON` — structured logging
+
+`HttpError.toJSON()` returns a `HttpErrorJSON` object that `JSON.stringify` produces automatically. Unlike the live error, this is guaranteed safe to serialise: `Headers` instances are flattened to `Record<string, string>`, `cause` is reduced to `{ name, message, code }` (no circular-reference throws), and `response` contains only primitives.
+
+```ts
+import type { HttpErrorJSON } from 'parcely'
+
+try {
+  await http.get('/u')
+} catch (e) {
+  if (e instanceof HttpError) {
+    logger.error(JSON.stringify(e))
+    //        ^^^^^^^^^^^^^^^^^^^^^^ HttpErrorJSON
+  }
+}
+```
+
+Fields: `name`, `message`, `code`, optional `status`, `config` (method/url/baseURL/headers/params/timeout), optional `response` (status/statusText/headers/data), optional `cause` ({ name, message, code }), optional `stack`. Strip `stack` before sending to untrusted endpoints.
 
 ## Fields
 

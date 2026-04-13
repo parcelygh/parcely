@@ -10,6 +10,74 @@ import TabItem from '@theme/TabItem';
 
 parcely is designed so axios users feel at home immediately. This guide shows every common axios pattern alongside its parcely equivalent, and includes a full feature-mapping table at the bottom.
 
+## Differences from axios
+
+parcely is a *different library* — not a drop-in replacement. These are the behavioural and surface-level differences you'll hit first, and the reasoning for each.
+
+### ESM-only
+
+parcely ships ESM only. If your project is CommonJS, use dynamic `import()` or add `"type": "module"` to your `package.json`. See the [installation guide](/docs/installation#esm-only) for details.
+
+*Why:* avoids dual-format maintenance, keeps tree-shaking clean, and Node 20+ / Bun / Deno / modern browsers all support ESM first-class.
+
+### No built-in retry
+
+axios needs `axios-retry`; parcely has `@parcely/retry` for the same feature set. Until you add it, a response error interceptor is three lines:
+
+```ts
+http.interceptors.response.use(undefined, async (err) => {
+  if (shouldRetry(err)) return http.request({ ...err.config, _retry: true })
+  throw err
+})
+```
+
+*Why:* retry is policy, not mechanism. Keeping it out of core means users pick exactly the backoff / jitter / idempotency rules they want.
+
+### No `transformRequest` / `transformResponse`
+
+Use request / response interceptors. Same expressive power, smaller API surface.
+
+### No `paramsSerializer` customization
+
+parcely always uses `URLSearchParams`. For axios-style bracket notation on arrays in request bodies, use `formDataSerializer: 'brackets'` on the config. For custom URL query serialization, pre-serialize the params yourself and pass them as a string via a request interceptor.
+
+*Why:* `paramsSerializer` has been a CVE surface in other clients (unescaped user input flowing into URLs). A single, predictable serializer closes that door.
+
+### No XMLHttpRequest fallback
+
+parcely uses global `fetch` exclusively. In environments where `fetch` is unavailable (ancient browsers, jsdom without a polyfill), parcely will not work. axios ships both XHR and http adapters.
+
+*Why:* `fetch` is universally available on every runtime we target (Node 20+, Bun, Deno, modern browsers). The XHR adapter in axios is ~30% of its bundle size and adds another surface for bugs.
+
+### Upload progress has browser limitations
+
+parcely implements upload progress via `ReadableStream` request bodies with `duplex: 'half'`. This works reliably in **Node (undici)** and **Chromium 105+**. In Safari and Firefox, fetch streaming request bodies aren't yet supported — `onUploadProgress` fires a single terminal callback at `loaded === total` on completion, with a one-shot `console.warn` in dev mode. axios uses XHR, which has broad upload-progress support but doesn't stream.
+
+*Why:* the streaming API is the right shape; browser support is catching up; the fallback is honest rather than silently broken.
+
+### Error shape
+
+`HttpError` vs axios's `AxiosError`:
+
+| axios | parcely |
+|-------|---------|
+| `err.response` | `err.response` (when we got bytes back) |
+| `err.request` | ✗ (raw `Request` not exposed — see [threat model](/docs/security/threat-model)) |
+| `err.config` | `err.config` (with sensitive headers redacted) |
+| `err.code` — loose string | `err.code` — discriminated union, exhaustive `switch` works |
+| `err.isAxiosError` | `err instanceof HttpError` or `isHttpError(err)` |
+| `err.toJSON()` | `err.toJSON()` — structured-logging friendly |
+
+### Response headers are `Headers`, not a plain object
+
+axios gives you `res.headers` as a `Record<string, string>`. parcely gives you a native `Headers` instance. Use `res.headers.get('x-thing')` instead of `res.headers['x-thing']`.
+
+*Why:* preserves casing normalization rules and multi-value semantics that plain objects mangle.
+
+### Cookies are not managed automatically in Node
+
+axios has optional `withCredentials` / cookie-jar integration for Node. parcely doesn't — if you need cookie jars in Node, use a [tough-cookie](https://github.com/salesforce/tough-cookie)-backed interceptor. Browser cookies work normally via the fetch `credentials` option.
+
 ## Creating a client
 
 <Tabs>

@@ -11,7 +11,7 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://parcely.dev',
+  url: 'https://parcely.cc',
   baseUrl: '/',
 
   onBrokenLinks: 'throw',

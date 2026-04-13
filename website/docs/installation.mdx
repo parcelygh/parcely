@@ -60,8 +60,44 @@ npm install @parcely/auth-redirect
 
 ## Requirements
 
-- **Node.js** 20+ (uses global `fetch` and built-in `undici` for TLS overrides)
+- **Node.js** 20+ (uses global `fetch` and `undici` for TLS overrides, installed via `optionalDependencies`)
 - **Browsers**: any environment with global `fetch` (all modern browsers)
 - **Bun** and **Deno** work out of the box
 
 parcely has **zero runtime dependencies**. TypeScript types are bundled in the package.
+
+## ESM-only
+
+parcely ships as **ESM only**. Each package's `exports` map declares `"import"` but not `"require"`. This keeps the bundle tree-shakeable and avoids dual-format maintenance burden.
+
+### If your project is already ESM
+
+No action needed — if your `package.json` has `"type": "module"`, everything just works:
+
+```ts
+import { createClient } from 'parcely'
+```
+
+### If your project is CommonJS
+
+You have three options:
+
+**1. Migrate to ESM** by adding `"type": "module"` to your `package.json`. Recommended for new codebases.
+
+**2. Use dynamic `import()`** from a CJS file:
+
+```js
+// index.js (CommonJS)
+async function main() {
+  const { createClient } = await import('parcely')
+  const http = createClient({ baseURL: 'https://api.example.com' })
+  // ...
+}
+main()
+```
+
+**3. Stay on a CJS-compatible client** like axios until you migrate. No shame in that — ESM-only is a deliberate design choice, not a judgement on your stack.
+
+### TypeScript consumers
+
+If your `tsconfig.json` uses `"module": "nodenext"` or `"module": "esnext"`, types resolve automatically. If you're on older `"module": "commonjs"`, add `"moduleResolution": "bundler"` or upgrade to `nodenext`.
