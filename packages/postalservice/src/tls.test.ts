@@ -81,6 +81,25 @@ describe('resolveDispatcher', () => {
     }
   });
 
+  it('throws an actionable error when undici is not installed', async () => {
+    // Simulate missing undici by shadowing the dynamic import. The current
+    // process MAY have undici installed (optionalDependency), so we stub
+    // Function() to produce an import that rejects with ERR_MODULE_NOT_FOUND.
+    const origFunction = globalThis.Function;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).Function = function FakeFn(_body: string) {
+      return () => Promise.reject(Object.assign(new Error("Cannot find package 'undici'"), { code: 'ERR_MODULE_NOT_FOUND' }));
+    } as unknown as typeof Function;
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      _resetTlsWarnings();
+      await expect(resolveDispatcher({ rejectUnauthorized: false })).rejects.toThrow(/undici.*not installed/i);
+    } finally {
+      globalThis.Function = origFunction;
+      warnSpy.mockRestore();
+    }
+  });
+
   it('does NOT warn about rejectUnauthorized in production', async () => {
     const origEnv = process.env['NODE_ENV'];
     process.env['NODE_ENV'] = 'production';

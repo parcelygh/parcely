@@ -11,9 +11,12 @@
     "docs:serve": "pnpm --filter website serve",
     "clean": "pnpm -r clean",
     "check-docs-coverage": "tsx scripts/check-docs-coverage.ts",
-    "check-doc-snippets": "tsx scripts/check-doc-snippets.ts"
+    "check-doc-snippets": "tsx scripts/check-doc-snippets.ts",
+    "check-treeshake": "tsx scripts/treeshake-check.ts",
+    "smoke": "tsx scripts/smoke.ts"
   },
   "devDependencies": {
+    "esbuild": "0.25.10",
     "rimraf": "^6.1.3",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"

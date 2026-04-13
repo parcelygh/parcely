@@ -56,10 +56,17 @@ export async function resolveDispatcher(
       },
     });
   } catch {
-    console.warn(
-      '[postalservice] Could not import undici. TLS options require undici on Node.',
+    // undici is an optionalDependency; on some platforms (or after a --no-optional
+    // install) it won't be present. Be loud — silently ignoring TLS config would
+    // leave a rejectUnauthorized:false request being made WITH cert verification
+    // still enforced, which is a confusing failure mode.
+    throw new Error(
+      '[postalservice] tls options were provided but the `undici` package is not installed. ' +
+        'Install it as a dependency to enable TLS customisation on Node:\n' +
+        '    npm install undici\n' +
+        "    # or: pnpm add undici  /  yarn add undici\n" +
+        'If you do not need TLS customisation, remove the `tls` option from your client config.',
     );
-    return undefined;
   }
 }
 
