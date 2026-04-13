@@ -3,6 +3,7 @@
   "references": [
     { "path": "packages/parcely" },
     { "path": "packages/auth-token" },
-    { "path": "packages/auth-redirect" }
+    { "path": "packages/auth-redirect" },
+    { "path": "packages/retry" }
   ]
 }
