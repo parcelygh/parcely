@@ -1,6 +1,9 @@
 dist
 node_modules
 
+# Git worktree scratch directory used by agent isolation
+.claude/worktrees/
+
 # Docusaurus
 website/build/
 website/.docusaurus/
