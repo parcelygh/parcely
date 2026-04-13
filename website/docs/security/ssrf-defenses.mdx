@@ -9,11 +9,11 @@ title: SSRF defenses
 
 Server-Side Request Forgery (SSRF) occurs when an attacker can influence the URL a server-side HTTP client requests. In axios, this was exploitable via CVE-2024-39338 and CVE-2025-27152, where absolute URLs or protocol-relative URLs (`//evil.com/path`) could override the configured `baseURL`.
 
-## How postalservice prevents it
+## How parcely prevents it
 
 ### 1. Reject absolute URLs when `baseURL` is set
 
-When a `baseURL` is configured, postalservice rejects any `url` that is absolute (starts with a protocol like `http:` or `https:`, or is protocol-relative like `//host/path`). This is controlled by:
+When a `baseURL` is configured, parcely rejects any `url` that is absolute (starts with a protocol like `http:` or `https:`, or is protocol-relative like `//host/path`). This is controlled by:
 
 ```ts
 const http = createClient({
@@ -33,7 +33,7 @@ await http.get('/users/me')
 
 ### 2. Protocol allowlist
 
-Even without a `baseURL`, postalservice restricts which URI schemes are permitted:
+Even without a `baseURL`, parcely restricts which URI schemes are permitted:
 
 ```ts
 const http = createClient({

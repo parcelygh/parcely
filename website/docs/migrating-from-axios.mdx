@@ -8,7 +8,7 @@ title: Migrating from axios
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-postalservice is designed so axios users feel at home immediately. This guide shows every common axios pattern alongside its postalservice equivalent, and includes a full feature-mapping table at the bottom.
+parcely is designed so axios users feel at home immediately. This guide shows every common axios pattern alongside its parcely equivalent, and includes a full feature-mapping table at the bottom.
 
 ## Creating a client
 
@@ -26,10 +26,10 @@ const http = axios.create({
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -51,7 +51,7 @@ const { data, status, headers } = await http.get('/users/me')
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
 const { data, status, headers } = await http.get('/users/me')
@@ -72,7 +72,7 @@ const { data } = await http.post('/users', { name: 'Mickey' })
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
 const { data } = await http.post('/users', { name: 'Mickey' })
@@ -93,7 +93,7 @@ await http.get('/search', { params: { q: 'hello', page: 1 } })
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
 await http.get('/search', { params: { q: 'hello', page: 1 } })
@@ -114,7 +114,7 @@ await http.get('/data', {
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
 await http.get('/data', {
@@ -144,10 +144,10 @@ try {
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
-import { isHttpError } from 'postalservice'
+import { isHttpError } from 'parcely'
 
 try {
   await http.get('/fail')
@@ -164,8 +164,8 @@ try {
 </Tabs>
 
 **Key differences:**
-- postalservice uses `isHttpError()` instead of `axios.isAxiosError()`.
-- Error codes are different: postalservice uses descriptive codes like `ERR_HTTP_STATUS`, `ERR_TIMEOUT`, `ERR_NETWORK`, `ERR_ABORTED`, `ERR_VALIDATION`, `ERR_PARSE`, `ERR_TOO_MANY_REDIRECTS`, `ERR_DISALLOWED_PROTOCOL`, `ERR_DISALLOWED_HEADER`, `ERR_ABSOLUTE_URL`, `ERR_CRLF_INJECTION`.
+- parcely uses `isHttpError()` instead of `axios.isAxiosError()`.
+- Error codes are different: parcely uses descriptive codes like `ERR_HTTP_STATUS`, `ERR_TIMEOUT`, `ERR_NETWORK`, `ERR_ABORTED`, `ERR_VALIDATION`, `ERR_PARSE`, `ERR_TOO_MANY_REDIRECTS`, `ERR_DISALLOWED_PROTOCOL`, `ERR_DISALLOWED_HEADER`, `ERR_ABSOLUTE_URL`, `ERR_CRLF_INJECTION`.
 - `err.status` is a top-level property (not only nested in `err.response`).
 
 ## Interceptors
@@ -189,7 +189,7 @@ http.interceptors.response.use(
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
 http.interceptors.request.use(
@@ -209,7 +209,7 @@ http.interceptors.response.use(
 </TabItem>
 </Tabs>
 
-**Key difference:** postalservice configs are plain objects -- spread and return a new object rather than mutating. Error handlers can `throw` instead of `return Promise.reject()`.
+**Key difference:** parcely configs are plain objects -- spread and return a new object rather than mutating. Error handlers can `throw` instead of `return Promise.reject()`.
 
 ## Cancellation
 
@@ -223,7 +223,7 @@ controller.abort()
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
 const controller = new AbortController()
@@ -234,7 +234,7 @@ controller.abort()
 </TabItem>
 </Tabs>
 
-Identical. postalservice does not support the legacy `CancelToken` API.
+Identical. parcely does not support the legacy `CancelToken` API.
 
 ## Timeouts
 
@@ -246,7 +246,7 @@ await http.get('/slow', { timeout: 3000 })
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
 await http.get('/slow', { timeout: 3000 })
@@ -255,7 +255,7 @@ await http.get('/slow', { timeout: 3000 })
 </TabItem>
 </Tabs>
 
-In postalservice, timeout is combined with a user-provided `signal` via `AbortSignal.any`, so both can coexist cleanly.
+In parcely, timeout is combined with a user-provided `signal` via `AbortSignal.any`, so both can coexist cleanly.
 
 ## File upload with FormData
 
@@ -269,7 +269,7 @@ await http.post('/upload', form)
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
 const form = new FormData()
@@ -292,7 +292,7 @@ await http.post('/upload', form, {
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
 await http.post('/upload', form, {
@@ -304,7 +304,7 @@ await http.post('/upload', form, {
 </TabItem>
 </Tabs>
 
-postalservice progress events include a `percent` field (0--100) when the total is known.
+parcely progress events include a `percent` field (0--100) when the total is known.
 
 ## Download progress
 
@@ -318,7 +318,7 @@ const { data } = await http.get('/big-file', {
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
 const { data } = await http.get('/big-file', {
@@ -340,7 +340,7 @@ const { data } = await http.get('/file', { responseType: 'arraybuffer' })
 ```
 
 </TabItem>
-<TabItem value="postalservice" label="postalservice">
+<TabItem value="parcely" label="parcely">
 
 ```ts
 const { data } = await http.get('/file', { responseType: 'arraybuffer' })
@@ -349,14 +349,14 @@ const { data } = await http.get('/file', { responseType: 'arraybuffer' })
 </TabItem>
 </Tabs>
 
-postalservice supports `'json'` (default), `'text'`, `'arraybuffer'`, and `'blob'`. The axios `'stream'` and `'document'` types are not provided.
+parcely supports `'json'` (default), `'text'`, `'arraybuffer'`, and `'blob'`. The axios `'stream'` and `'document'` types are not provided.
 
-## Runtime validation (new in postalservice)
+## Runtime validation (new in parcely)
 
-postalservice adds a `validate` option with no axios equivalent:
+parcely adds a `validate` option with no axios equivalent:
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 import { z } from 'zod'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
@@ -370,7 +370,7 @@ Validators can be Zod schemas, Valibot schemas, ArkType types, objects with a `.
 
 ## Feature-mapping table
 
-| axios config key | postalservice equivalent | Notes |
+| axios config key | parcely equivalent | Notes |
 |---|---|---|
 | `baseURL` | `baseURL` | Accepts `string \| URL`. When set, absolute URLs in `url` are rejected by default (SSRF protection). |
 | `url` | `url` | Relative path appended to `baseURL`. |
@@ -387,8 +387,8 @@ Validators can be Zod schemas, Valibot schemas, ArkType types, objects with a `.
 | `cancelToken` | Not provided | Use standard `AbortController` / `signal` instead. `CancelToken` is a legacy axios API. |
 | `transformRequest` | Not provided | Use a request interceptor instead. Interceptors are more composable and testable. |
 | `transformResponse` | Not provided | Use a response interceptor or `validate` for runtime type checking. |
-| `adapter` | Not provided | postalservice always uses `fetch`. For testing, stub `globalThis.fetch`. |
-| `auth` | Not provided as config | Use `headers: { Authorization: 'Bearer ...' }` or `@postalservice/auth-token`. |
+| `adapter` | Not provided | parcely always uses `fetch`. For testing, stub `globalThis.fetch`. |
+| `auth` | Not provided as config | Use `headers: { Authorization: 'Bearer ...' }` or `@parcely/auth-token`. |
 | `xsrfCookieName` / `xsrfHeaderName` | Not provided | XSRF token handling is better done at the framework level (e.g., meta tags). Use a request interceptor if needed. |
 | `maxContentLength` / `maxBodyLength` | Not provided | Not a v1 feature. Can be implemented via a response interceptor. |
 | `decompress` | Not provided | `fetch` handles decompression automatically. |
@@ -397,7 +397,7 @@ Validators can be Zod schemas, Valibot schemas, ArkType types, objects with a `.
 | `validateStatus` | Not provided | Non-2xx responses always throw `HttpError` with code `ERR_HTTP_STATUS`. Use a response interceptor to customise. |
 | `paramsSerializer` | Not provided | Built-in serialiser handles arrays and nested objects. |
 | `formSerializer` | `formDataSerializer` | Controls how arrays and nested objects are serialised in auto-FormData: `'brackets'` (default), `'indices'`, or `'repeat'`. |
-| `withCredentials` | Not provided | Set `credentials: 'include'` via a request interceptor if needed. postalservice does not wrap the fetch `credentials` option. |
+| `withCredentials` | Not provided | Set `credentials: 'include'` via a request interceptor if needed. parcely does not wrap the fetch `credentials` option. |
 | `withXSRFToken` | Not provided | Use a request interceptor to read cookies and set headers. |
 | N/A | `validate` | **New.** Runtime response validation via Standard Schema, `.parse()`, or function. |
 | N/A | `allowAbsoluteUrls` | **New.** When `false` (default when `baseURL` is set), rejects absolute URLs. Prevents SSRF. |

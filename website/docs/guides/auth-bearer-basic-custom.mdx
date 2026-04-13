@@ -7,12 +7,12 @@ title: Auth (Bearer, Basic, custom)
 
 ## Use case
 
-Attach authentication credentials to every request. You can do this manually with default headers, with a request interceptor, or with the `@postalservice/auth-token` addon.
+Attach authentication credentials to every request. You can do this manually with default headers, with a request interceptor, or with the `@parcely/auth-token` addon.
 
 ## Manual header
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -27,7 +27,7 @@ const http = createClient({
 For dynamic tokens (e.g., read from storage on each request):
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -40,13 +40,13 @@ http.interceptors.request.use((config) => ({
 }))
 ```
 
-## Using `@postalservice/auth-token`
+## Using `@parcely/auth-token`
 
-The `@postalservice/auth-token` addon provides a higher-level API:
+The `@parcely/auth-token` addon provides a higher-level API:
 
 ```ts
-import { createClient } from 'postalservice'
-import { createAuthToken } from '@postalservice/auth-token'
+import { createClient } from 'parcely'
+import { createAuthToken } from '@parcely/auth-token'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -89,15 +89,15 @@ In axios you would typically use an interceptor or the `auth` config option:
 // axios auth config:
 await http.get('/data', { auth: { username: 'user', password: 'pass' } })
 
-// postalservice equivalent (manual):
+// parcely equivalent (manual):
 const encoded = btoa('user:pass')
 await http.get('/data', { headers: { Authorization: `Basic ${encoded}` } })
 ```
 
-postalservice does not have a dedicated `auth` config key. Use headers directly or the `@postalservice/auth-token` addon.
+parcely does not have a dedicated `auth` config key. Use headers directly or the `@parcely/auth-token` addon.
 
 ## Notes and gotchas
 
 - The `Authorization` header is in the default `sensitiveHeaders` list, so it is automatically stripped on cross-origin redirects.
 - The `Authorization` header value is redacted in error objects and the response envelope `config`.
-- `@postalservice/auth-token` supports custom `header` names (e.g., `X-API-Key`) and custom `scheme` strings.
+- `@parcely/auth-token` supports custom `header` names (e.g., `X-API-Key`) and custom `scheme` strings.

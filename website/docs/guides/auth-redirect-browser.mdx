@@ -9,11 +9,11 @@ title: Auth redirect (browser)
 
 In a browser app, redirect the user to a login page when the API returns 401 or 403.
 
-## Using `@postalservice/auth-redirect`
+## Using `@parcely/auth-redirect`
 
 ```ts
-import { createClient } from 'postalservice'
-import { createAuthRedirect } from '@postalservice/auth-redirect'
+import { createClient } from 'parcely'
+import { createAuthRedirect } from '@parcely/auth-redirect'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -52,7 +52,7 @@ const redirect = createAuthRedirect({
 })
 ```
 
-## Combining with `@postalservice/auth-token`
+## Combining with `@parcely/auth-token`
 
 If you install both addons, install auth-token **first**. The redirect will only fire after the token refresh has failed:
 

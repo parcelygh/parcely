@@ -12,7 +12,7 @@ Abort requests that take too long, either at the client level or per request.
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -25,10 +25,10 @@ await http.get('/slow-endpoint', { timeout: 30000 })
 
 ## How it works
 
-postalservice creates an `AbortSignal.timeout(ms)` and combines it with any user-provided `signal` via `AbortSignal.any`. When the timeout fires, the request throws `HttpError` with `code: 'ERR_TIMEOUT'`.
+parcely creates an `AbortSignal.timeout(ms)` and combines it with any user-provided `signal` via `AbortSignal.any`. When the timeout fires, the request throws `HttpError` with `code: 'ERR_TIMEOUT'`.
 
 ```ts
-import { isHttpError } from 'postalservice'
+import { isHttpError } from 'parcely'
 
 try {
   await http.get('/slow')
@@ -45,11 +45,11 @@ try {
 // axios:
 await http.get('/slow', { timeout: 5000 })
 
-// postalservice (identical):
+// parcely (identical):
 await http.get('/slow', { timeout: 5000 })
 ```
 
-In axios, the timeout error has `code: 'ECONNABORTED'`. In postalservice it is `code: 'ERR_TIMEOUT'`.
+In axios, the timeout error has `code: 'ECONNABORTED'`. In parcely it is `code: 'ERR_TIMEOUT'`.
 
 ## Notes and gotchas
 

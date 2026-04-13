@@ -1,15 +1,15 @@
-# postalservice
+# parcely
 
 Zero-dependency, fetch-based HTTP client with axios-like ergonomics and a secure-by-default posture.
 
 ```sh
-npm install postalservice
+npm install parcely
 # if you plan to use tls customization on Node:
 npm install undici
 ```
 
 ```ts
-import { createClient, HttpError } from 'postalservice'
+import { createClient, HttpError } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://api.example.com',

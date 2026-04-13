@@ -7,12 +7,12 @@ title: Node.js usage
 
 ## Use case
 
-Use postalservice in a Node.js 20+ application.
+Use parcely in a Node.js 20+ application.
 
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -23,7 +23,7 @@ const { data } = await http.get('/users')
 console.log(data)
 ```
 
-No special configuration needed. postalservice uses `globalThis.fetch`, which is available in Node 20+.
+No special configuration needed. parcely uses `globalThis.fetch`, which is available in Node 20+.
 
 ## TLS overrides
 
@@ -58,8 +58,8 @@ import axios from 'axios'
 const http = axios.create({ baseURL: 'https://api.example.com' })
 const { data } = await http.get('/users')
 
-// postalservice (identical pattern):
-import { createClient } from 'postalservice'
+// parcely (identical pattern):
+import { createClient } from 'parcely'
 const http2 = createClient({ baseURL: 'https://api.example.com' })
 const { data: d2 } = await http2.get('/users')
 ```
@@ -67,6 +67,6 @@ const { data: d2 } = await http2.get('/users')
 ## Notes and gotchas
 
 - Requires Node 20 or later (for `globalThis.fetch` and `AbortSignal.any`).
-- The `tls` option triggers a lazy `await import('undici')` to create a custom dispatcher. This is the only time postalservice imports a Node-specific module.
+- The `tls` option triggers a lazy `await import('undici')` to create a custom dispatcher. This is the only time parcely imports a Node-specific module.
 - `tls.rejectUnauthorized: false` emits a one-shot `console.warn` to remind you not to use it in production.
 - Node `fs.ReadStream` bodies are transparently converted to Web `ReadableStream`.

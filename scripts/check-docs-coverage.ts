@@ -1,7 +1,7 @@
 /**
  * check-docs-coverage.ts
  *
- * Parses packages/postalservice/src/types.ts and errors.ts for exported
+ * Parses packages/parcely/src/types.ts and errors.ts for exported
  * identifiers, then greps every website/docs/**\/*.mdx for each identifier.
  * Fails with non-zero exit code if any identifier is referenced in zero pages.
  */
@@ -90,8 +90,8 @@ function collectMdxFiles(dir: string): string[] {
 // 3. Check coverage
 // ---------------------------------------------------------------------------
 
-const typesFile = path.join(ROOT, 'packages/postalservice/src/types.ts');
-const errorsFile = path.join(ROOT, 'packages/postalservice/src/errors.ts');
+const typesFile = path.join(ROOT, 'packages/parcely/src/types.ts');
+const errorsFile = path.join(ROOT, 'packages/parcely/src/errors.ts');
 
 const identifiers = [
   ...getExportedIdentifiers(typesFile),

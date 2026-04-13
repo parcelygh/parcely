@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// postalservice — interceptor chain
+// parcely — interceptor chain
 // ---------------------------------------------------------------------------
 
 export interface InterceptorEntry<T> {

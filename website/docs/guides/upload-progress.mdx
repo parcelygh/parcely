@@ -12,7 +12,7 @@ Show a progress bar during file uploads.
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -44,7 +44,7 @@ interface ProgressEvent {
 | Chromium 105+ | Full support via `duplex: 'half'` + `ReadableStream` request body |
 | Safari / Firefox | Terminal callback only (`loaded === total` on completion) |
 
-On Safari and Firefox, `fetch` does not support streaming request bodies. postalservice falls back to a single progress callback at completion and emits a one-shot `console.warn` explaining the browser limitation in development mode.
+On Safari and Firefox, `fetch` does not support streaming request bodies. parcely falls back to a single progress callback at completion and emits a one-shot `console.warn` explaining the browser limitation in development mode.
 
 ## Axios equivalent
 
@@ -54,7 +54,7 @@ await http.post('/upload', form, {
   onUploadProgress: (e) => console.log(e.loaded, e.total),
 })
 
-// postalservice (adds percent):
+// parcely (adds percent):
 await http.post('/upload', form, {
   onUploadProgress: ({ loaded, total, percent }) =>
     console.log(loaded, total, percent),
@@ -63,6 +63,6 @@ await http.post('/upload', form, {
 
 ## Notes and gotchas
 
-- postalservice automatically sets `duplex: 'half'` on the fetch options when `onUploadProgress` is provided and the body is streamable.
+- parcely automatically sets `duplex: 'half'` on the fetch options when `onUploadProgress` is provided and the body is streamable.
 - `total` and `percent` are `undefined` when the stream length is not knowable.
 - Stream errors during upload produce `HttpError` with `code: 'ERR_NETWORK'`.

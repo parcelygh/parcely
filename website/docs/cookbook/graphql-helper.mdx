@@ -7,12 +7,12 @@ title: GraphQL helper
 
 ## Use case
 
-Make GraphQL queries and mutations using postalservice.
+Make GraphQL queries and mutations using parcely.
 
 ## Helper function
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -57,4 +57,4 @@ const user = await graphql<User>(
 - GraphQL uses POST with a JSON body containing `query` and `variables`.
 - Error handling for GraphQL is application-level (the HTTP status is usually 200 even for errors).
 - Consider adding the `validate` option with a Zod schema for the GraphQL response shape.
-- For subscriptions, you would need a WebSocket client -- postalservice is HTTP-only.
+- For subscriptions, you would need a WebSocket client -- parcely is HTTP-only.

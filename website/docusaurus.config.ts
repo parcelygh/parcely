@@ -3,7 +3,7 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'postalservice',
+  title: 'parcely',
   tagline: 'A fetch-based HTTP client with an Axios-like API',
   favicon: 'img/favicon.ico',
 
@@ -11,7 +11,7 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://postalservice.dev',
+  url: 'https://parcely.dev',
   baseUrl: '/',
 
   onBrokenLinks: 'throw',
@@ -47,9 +47,9 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'postalservice',
+      title: 'parcely',
       logo: {
-        alt: 'postalservice logo',
+        alt: 'parcely logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -60,7 +60,7 @@ const config: Config = {
           label: 'Docs',
         },
         {
-          href: 'https://github.com/postalservice/postalservice',
+          href: 'https://github.com/parcely/parcely',
           label: 'GitHub',
           position: 'right',
         },
@@ -79,7 +79,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright \u00a9 ${new Date().getFullYear()} postalservice contributors. Built with Docusaurus.`,
+      copyright: `Copyright \u00a9 ${new Date().getFullYear()} parcely contributors. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,

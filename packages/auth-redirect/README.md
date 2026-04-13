@@ -1,14 +1,14 @@
-# @postalservice/auth-redirect
+# @parcely/auth-redirect
 
-Browser-side login-redirect interceptor for [`postalservice`](https://www.npmjs.com/package/postalservice). On `401` / `403`, redirects to a login URL — with optional `return_to` preservation, a `shouldRedirect` predicate, and cooldown debounce to prevent redirect storms.
+Browser-side login-redirect interceptor for [`parcely`](https://www.npmjs.com/package/parcely). On `401` / `403`, redirects to a login URL — with optional `return_to` preservation, a `shouldRedirect` predicate, and cooldown debounce to prevent redirect storms.
 
 ```sh
-npm install postalservice @postalservice/auth-redirect
+npm install parcely @parcely/auth-redirect
 ```
 
 ```ts
-import { createClient } from 'postalservice'
-import { createAuthRedirect } from '@postalservice/auth-redirect'
+import { createClient } from 'parcely'
+import { createAuthRedirect } from '@parcely/auth-redirect'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -33,7 +33,7 @@ redirect.install(http)
 - **Non-browser runtime:** no-op with a one-shot `console.warn` — safe to install in isomorphic code.
 - **Always rethrows** the original error after (or instead of) triggering a redirect.
 
-## Ordering with `@postalservice/auth-token`
+## Ordering with `@parcely/auth-token`
 
 Install `auth-token` first and `auth-redirect` second. Refresh-on-401 gets first crack at the error; if refresh succeeds, the retried request typically resolves and the redirect never fires. If refresh fails or isn't configured, the redirect handles it.
 

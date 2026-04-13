@@ -11,10 +11,10 @@ Retry failed requests (network errors, 5xx responses) with increasing delays bet
 
 ## Interceptor recipe
 
-postalservice does not include a built-in retry mechanism in v1 (a `@postalservice/retry` package is planned). Here is a response interceptor recipe:
+parcely does not include a built-in retry mechanism in v1 (a `@parcely/retry` package is planned). Here is a response interceptor recipe:
 
 ```ts
-import { createClient, isHttpError } from 'postalservice'
+import { createClient, isHttpError } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -42,7 +42,7 @@ http.interceptors.response.use(undefined, async (err) => {
 
 ## Axios equivalent
 
-The pattern is the same in axios -- a response interceptor with retry logic. Libraries like `axios-retry` wrap this; a similar `@postalservice/retry` package is planned.
+The pattern is the same in axios -- a response interceptor with retry logic. Libraries like `axios-retry` wrap this; a similar `@parcely/retry` package is planned.
 
 ## Notes and gotchas
 

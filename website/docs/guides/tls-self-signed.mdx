@@ -12,7 +12,7 @@ Connect to a server with a self-signed TLS certificate in development or testing
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://localhost:3443',
@@ -26,7 +26,7 @@ const { data } = await http.get('/health')
 
 ## How it works
 
-When `tls` is set, postalservice lazy-imports `undici` (built into Node 20+) and creates a custom `Agent` with the specified TLS options. This is passed to `fetch` as a dispatcher.
+When `tls` is set, parcely lazy-imports `undici` (built into Node 20+) and creates a custom `Agent` with the specified TLS options. This is passed to `fetch` as a dispatcher.
 
 ## Axios equivalent
 
@@ -39,7 +39,7 @@ const http = axios.create({
   httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 })
 
-// postalservice:
+// parcely:
 const http2 = createClient({
   baseURL: 'https://localhost:3443',
   tls: { rejectUnauthorized: false },

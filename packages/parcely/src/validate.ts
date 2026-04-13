@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// postalservice — validator runner
+// parcely — validator runner
 // ---------------------------------------------------------------------------
 
 import type { Validator, RequestConfig } from './types.js';

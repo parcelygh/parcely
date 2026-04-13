@@ -14,7 +14,7 @@ Send different body types: JSON objects, FormData for file uploads, URL-encoded 
 Plain objects are automatically serialised to JSON with `Content-Type: application/json`:
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -35,7 +35,7 @@ await http.post('/profile', form)
 
 ## Auto-FormData from plain objects
 
-When a plain object contains any `File` or `Blob` value, postalservice automatically converts it to `FormData`:
+When a plain object contains any `File` or `Blob` value, parcely automatically converts it to `FormData`:
 
 ```ts
 await http.post('/profile', {
@@ -75,16 +75,16 @@ await http.post('/upload', blob)
 
 ## Axios equivalent
 
-In axios, the body parameter is called `data` in the config. In postalservice, it is `body` in the config, but method helpers (`.post()`, `.put()`, `.patch()`) accept it as the second positional argument just like axios:
+In axios, the body parameter is called `data` in the config. In parcely, it is `body` in the config, but method helpers (`.post()`, `.put()`, `.patch()`) accept it as the second positional argument just like axios:
 
 ```ts
 // Both work the same way positionally:
 // axios:          http.post('/url', bodyData, config)
-// postalservice:  http.post('/url', bodyData, config)
+// parcely:  http.post('/url', bodyData, config)
 ```
 
 ## Notes and gotchas
 
 - Auto-FormData triggers only when the body is a **plain object** (prototype is `Object.prototype` or `null`) and contains at least one `File` or `Blob`. Class instances and `URLSearchParams` are not converted.
-- If you manually set `Content-Type`, postalservice respects it and skips auto-detection.
+- If you manually set `Content-Type`, parcely respects it and skips auto-detection.
 - The `formDataSerializer` option controls how arrays and nested objects are encoded: `'brackets'` produces `tags[]=admin&tags[]=staff`, `'indices'` produces `tags[0]=admin&tags[1]=staff`, `'repeat'` produces `tags=admin&tags=staff`.

@@ -9,9 +9,9 @@ title: Timeout and abort cleanup
 
 Leaked timers and unconsumed response bodies can cause resource leaks, especially in long-running server processes. If a timeout fires after a response has already been handled, it can abort unrelated requests or leave dangling references.
 
-## How postalservice prevents it
+## How parcely prevents it
 
-postalservice combines timeout and user signals via `AbortSignal.any([userSignal, AbortSignal.timeout(ms)])`. The request lifecycle uses a `finally` block to:
+parcely combines timeout and user signals via `AbortSignal.any([userSignal, AbortSignal.timeout(ms)])`. The request lifecycle uses a `finally` block to:
 
 1. Clear any pending timers.
 2. Ensure the response body is consumed or discarded (no dangling `ReadableStream`).

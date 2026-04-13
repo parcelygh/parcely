@@ -12,7 +12,7 @@ Validate API responses at runtime using ArkType, a TypeScript-native validator.
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 import { type } from 'arktype'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
@@ -30,12 +30,12 @@ const { data } = await http.get('/users/me', {
 
 ## How it works
 
-ArkType 2+ implements Standard Schema v1, so it works with postalservice's `validate` option out of the box.
+ArkType 2+ implements Standard Schema v1, so it works with parcely's `validate` option out of the box.
 
 ## Error handling
 
 ```ts
-import { isHttpError } from 'postalservice'
+import { isHttpError } from 'parcely'
 
 try {
   await http.get('/users/me', { validate: User })
@@ -52,6 +52,6 @@ Axios has no built-in validation support.
 
 ## Notes and gotchas
 
-- ArkType is a dependency of your app, not of postalservice.
+- ArkType is a dependency of your app, not of parcely.
 - ArkType 2+ is required for Standard Schema v1 support.
 - The `Validator<T>` type supports Standard Schema v1, `.parse()` objects, and plain functions.

@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     # Only run on the canonical repo (skip on forks) and skip release-PR commits
     # themselves to avoid loops.
-    if: github.repository == 'OWNER/postalservice'
+    if: github.repository == 'OWNER/parcely'
     permissions:
       contents: write
       pull-requests: write

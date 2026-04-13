@@ -12,7 +12,7 @@ Upload files to a server using multipart form data.
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -25,7 +25,7 @@ await http.post('/upload', form)
 
 ## Auto-conversion from plain objects
 
-When a plain object contains `File` or `Blob` values, postalservice automatically converts it to `FormData`:
+When a plain object contains `File` or `Blob` values, parcely automatically converts it to `FormData`:
 
 ```ts
 await http.post('/upload', {
@@ -54,17 +54,17 @@ const form = new FormData()
 form.append('avatar', file)
 await http.post('/upload', form)
 
-// postalservice (identical pattern):
+// parcely (identical pattern):
 const form2 = new FormData()
 form2.set('avatar', file)
 await http.post('/upload', form2)
 ```
 
-Axios auto-converts plain objects with File/Blob to FormData via `formSerializer`. postalservice uses `formDataSerializer` with the same default (`'brackets'`).
+Axios auto-converts plain objects with File/Blob to FormData via `formSerializer`. parcely uses `formDataSerializer` with the same default (`'brackets'`).
 
 ## Notes and gotchas
 
 - Auto-FormData triggers only when the body is a **plain object** (prototype is `Object.prototype` or `null`) with at least one `File` or `Blob` value.
 - `FormData` instances are passed through without modification.
 - `Content-Type` (with multipart boundary) is set automatically. Do not set it manually.
-- If you manually set `Content-Type`, postalservice respects it and skips auto-conversion.
+- If you manually set `Content-Type`, parcely respects it and skips auto-conversion.

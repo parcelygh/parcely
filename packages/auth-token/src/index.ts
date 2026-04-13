@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// @postalservice/auth-token — attach tokens to requests; refresh on 401
+// @parcely/auth-token — attach tokens to requests; refresh on 401
 // ---------------------------------------------------------------------------
 
 import type {
@@ -7,7 +7,7 @@ import type {
   InterceptorHandler,
   RequestConfig,
   HttpResponse,
-} from 'postalservice';
+} from 'parcely';
 
 import { createSingleFlight } from './single-flight.js';
 
@@ -139,8 +139,8 @@ function isHttpErrorLike(err: unknown): err is HttpErrorLike {
  *
  * @example
  * ```ts
- * import { createAuthToken } from '@postalservice/auth-token';
- * import { createClient } from 'postalservice';
+ * import { createAuthToken } from '@parcely/auth-token';
+ * import { createClient } from 'parcely';
  *
  * const http = createClient({ baseURL: 'https://api.example.com' });
  * const auth = createAuthToken({

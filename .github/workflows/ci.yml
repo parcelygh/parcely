@@ -85,7 +85,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build core package (smoke reads from dist/)
-        run: pnpm --filter postalservice build
+        run: pnpm --filter parcely build
 
       - name: Run smoke test
         run: pnpm smoke

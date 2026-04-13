@@ -1,7 +1,7 @@
 {
   "files": [],
   "references": [
-    { "path": "packages/postalservice" },
+    { "path": "packages/parcely" },
     { "path": "packages/auth-token" },
     { "path": "packages/auth-redirect" }
   ]

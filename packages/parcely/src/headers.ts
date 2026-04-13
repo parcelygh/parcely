@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// postalservice — header merging
+// parcely — header merging
 // ---------------------------------------------------------------------------
 
 import type { HeadersInit, RequestConfig } from './types.js';

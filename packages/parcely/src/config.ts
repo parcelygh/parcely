@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// postalservice — config merging (prototype-pollution-safe)
+// parcely — config merging (prototype-pollution-safe)
 // ---------------------------------------------------------------------------
 
 import type { RequestConfig, HeadersInit } from './types.js';

@@ -12,7 +12,7 @@ Respect API rate limits by detecting 429 responses and backing off before retryi
 ## Interceptor recipe
 
 ```ts
-import { createClient, isHttpError } from 'postalservice'
+import { createClient, isHttpError } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -36,4 +36,4 @@ http.interceptors.response.use(undefined, async (err) => {
 - The `Retry-After` header may be in seconds or a date string. This example handles the seconds case.
 - Set an upper bound on the retry delay to avoid hanging indefinitely.
 - Combine with the [retries with backoff](/docs/guides/retries-with-backoff) pattern for comprehensive retry logic.
-- A dedicated `@postalservice/retry` package is planned for the future.
+- A dedicated `@parcely/retry` package is planned for the future.

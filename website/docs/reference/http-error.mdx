@@ -8,7 +8,7 @@ title: HttpError
 An error class thrown for all request failures. Extends `Error`.
 
 ```ts
-import { HttpError, isHttpError } from 'postalservice'
+import { HttpError, isHttpError } from 'parcely'
 ```
 
 ## Class definition
@@ -60,7 +60,7 @@ Returns `true` if the value is an instance of `HttpError`.
 ## Example
 
 ```ts
-import { createClient, isHttpError } from 'postalservice'
+import { createClient, isHttpError } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 

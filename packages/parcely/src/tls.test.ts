@@ -27,7 +27,7 @@ describe('resolveDispatcher', () => {
       const result = await resolveDispatcher({ rejectUnauthorized: true });
       expect(result).toBeUndefined();
       expect(warnSpy).toHaveBeenCalledWith(
-        '[postalservice] TLS options are ignored in browser environments.',
+        '[parcely] TLS options are ignored in browser environments.',
       );
     } finally {
       globalThis.process = origProcess;

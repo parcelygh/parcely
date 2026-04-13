@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// postalservice — client factory
+// parcely — client factory
 // ---------------------------------------------------------------------------
 
 import type { RequestConfig, HttpResponse, Client, InterceptorManager, InterceptorHandler } from './types.js';
@@ -7,7 +7,7 @@ import { createInterceptorChain } from './interceptors.js';
 import { send } from './request.js';
 
 /**
- * Create a postalservice client instance.
+ * Create a parcely client instance.
  */
 export function createClient(defaults: RequestConfig = {}): Client {
   const requestChain = createInterceptorChain<RequestConfig>();

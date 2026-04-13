@@ -12,7 +12,7 @@ Upload a raw file (Blob, File, or ArrayBuffer) as the entire request body, witho
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -51,7 +51,7 @@ await http.post('/upload', blob, {
   headers: { 'Content-Type': 'application/zip' },
 })
 
-// postalservice (identical for Blob/File):
+// parcely (identical for Blob/File):
 await http.post('/upload', blob)
 // Content-Type is inferred from blob.type
 ```

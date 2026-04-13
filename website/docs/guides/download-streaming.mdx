@@ -11,14 +11,14 @@ Consume a response body incrementally as a `ReadableStream` rather than bufferin
 
 ## Current status
 
-postalservice v1 supports `responseType` values of `'json'`, `'text'`, `'arraybuffer'`, and `'blob'`. A `'stream'` response type that returns the raw `ReadableStream` is planned for a future release.
+parcely v1 supports `responseType` values of `'json'`, `'text'`, `'arraybuffer'`, and `'blob'`. A `'stream'` response type that returns the raw `ReadableStream` is planned for a future release.
 
 ## Workaround: download progress with blob
 
 For large downloads, use `onDownloadProgress` to track progress while downloading into a blob:
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -33,7 +33,7 @@ const { data } = await http.get('/large-file', {
 
 ## Axios equivalent
 
-Axios provides `responseType: 'stream'` in Node.js, which returns a Node `Readable`. postalservice does not currently provide this. Use the `onDownloadProgress` callback for incremental tracking.
+Axios provides `responseType: 'stream'` in Node.js, which returns a Node `Readable`. parcely does not currently provide this. Use the `onDownloadProgress` callback for incremental tracking.
 
 ## Notes and gotchas
 

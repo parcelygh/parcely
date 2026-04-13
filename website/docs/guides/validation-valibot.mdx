@@ -12,7 +12,7 @@ Validate API responses at runtime using Valibot, a lightweight schema library.
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 import * as v from 'valibot'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
@@ -31,12 +31,12 @@ const { data } = await http.get('/users/me', {
 
 ## How it works
 
-Valibot 1+ implements Standard Schema v1, which postalservice accepts natively. No adapter is needed.
+Valibot 1+ implements Standard Schema v1, which parcely accepts natively. No adapter is needed.
 
 ## Error handling
 
 ```ts
-import { isHttpError } from 'postalservice'
+import { isHttpError } from 'parcely'
 
 try {
   await http.get('/users/me', { validate: UserSchema })
@@ -49,10 +49,10 @@ try {
 
 ## Axios equivalent
 
-Axios has no built-in validation. postalservice supports it natively.
+Axios has no built-in validation. parcely supports it natively.
 
 ## Notes and gotchas
 
-- Valibot is a dependency of your app, not of postalservice.
-- Valibot's tree-shakeable design pairs well with postalservice's own tree-shakeability.
+- Valibot is a dependency of your app, not of parcely.
+- Valibot's tree-shakeable design pairs well with parcely's own tree-shakeability.
 - The `Validator<T>` type supports Standard Schema v1 (Valibot 1+), `.parse()` objects, and plain functions.

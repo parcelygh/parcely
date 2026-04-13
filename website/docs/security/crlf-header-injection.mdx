@@ -9,16 +9,16 @@ title: CRLF header injection
 
 CRLF (Carriage Return Line Feed) injection occurs when `\r\n` characters in header values allow an attacker to inject additional HTTP headers or split the response. This can lead to HTTP response splitting, cache poisoning, or session fixation.
 
-## How postalservice prevents it
+## How parcely prevents it
 
-postalservice constructs all request headers using the native `Headers` API. The `Headers` constructor and `set`/`append` methods validate header names and values, rejecting any that contain `\r`, `\n`, or `\0` characters.
+parcely constructs all request headers using the native `Headers` API. The `Headers` constructor and `set`/`append` methods validate header names and values, rejecting any that contain `\r`, `\n`, or `\0` characters.
 
-If a CRLF injection is detected, postalservice throws `HttpError` with `code: 'ERR_CRLF_INJECTION'`.
+If a CRLF injection is detected, parcely throws `HttpError` with `code: 'ERR_CRLF_INJECTION'`.
 
 ## Example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 

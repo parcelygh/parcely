@@ -3,7 +3,7 @@
  *
  * Extracts every ```ts / ```tsx code block from
  * website/docs/migrating-from-axios.mdx, writes them to a temp file that
- * imports from the local postalservice workspace package, and runs
+ * imports from the local parcely workspace package, and runs
  * tsc --noEmit over it.  Fails if type-check fails.
  */
 
@@ -26,26 +26,26 @@ let match: RegExpExecArray | null;
 
 while ((match = codeBlockRegex.exec(content)) !== null) {
   const code = match[1]!;
-  // We only type-check blocks that import from postalservice
-  if (code.includes("from 'postalservice'")) {
+  // We only type-check blocks that import from parcely
+  if (code.includes("from 'parcely'")) {
     blocks.push(code);
   }
 }
 
 if (blocks.length === 0) {
-  console.log('No postalservice TypeScript code blocks found in migration guide.');
+  console.log('No parcely TypeScript code blocks found in migration guide.');
   process.exit(0);
 }
 
-console.log(`Found ${blocks.length} postalservice code block(s) to type-check.`);
+console.log(`Found ${blocks.length} parcely code block(s) to type-check.`);
 
 // Create a temp directory
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ps-doc-snippets-'));
 
-// Create a postalservice declaration file that matches the public API.
+// Create a parcely declaration file that matches the public API.
 // We derive this from the actual source types so it stays in sync.
-const postalserviceDts = `
-declare module 'postalservice' {
+const parcelyDts = `
+declare module 'parcely' {
   export interface TlsConfig {
     rejectUnauthorized?: boolean;
     ca?: string | string[];
@@ -160,21 +160,21 @@ declare module 'postalservice' {
 }
 `;
 
-fs.writeFileSync(path.join(tmpDir, 'postalservice.d.ts'), postalserviceDts, 'utf-8');
+fs.writeFileSync(path.join(tmpDir, 'parcely.d.ts'), parcelyDts, 'utf-8');
 
 // Write a combined file with all snippets wrapped in async functions
 const preamble = `
-// Auto-generated: postalservice doc snippet type-check
+// Auto-generated: parcely doc snippet type-check
 // This file is not meant to be executed, only type-checked.
 
-/// <reference path="./postalservice.d.ts" />
+/// <reference path="./parcely.d.ts" />
 
 declare const file: File;
 declare const fileBlob: Blob;
 declare const largeFile: File;
 declare const arrayBuffer: ArrayBuffer;
 declare const someReadableStream: ReadableStream;
-declare const http: import('postalservice').Client;
+declare const http: import('parcely').Client;
 declare const form: FormData;
 `;
 
@@ -190,16 +190,16 @@ const snippetBodies = blocks.map((block, i) => {
   // Actually, we need to extract the bindings and declare them from the ambient module.
   // Since we have an ambient module declaration, we can use dynamic import destructuring.
 
-  // Extract named imports from postalservice
-  const postalserviceBindings: string[] = [];
+  // Extract named imports from parcely
+  const parcelyBindings: string[] = [];
   const zodBindings: string[] = [];
 
   for (const line of importLines) {
-    // Match: import { foo, bar } from 'postalservice'
-    const namedMatch = line.match(/import\s+\{([^}]+)\}\s+from\s+'postalservice'/);
+    // Match: import { foo, bar } from 'parcely'
+    const namedMatch = line.match(/import\s+\{([^}]+)\}\s+from\s+'parcely'/);
     if (namedMatch) {
       const names = namedMatch[1]!.split(',').map((n) => n.trim()).filter(Boolean);
-      postalserviceBindings.push(...names);
+      parcelyBindings.push(...names);
     }
     // Match: import { z } from 'zod' or import * as z from 'zod'
     if (line.includes("from 'zod'")) {
@@ -209,8 +209,8 @@ const snippetBodies = blocks.map((block, i) => {
 
   // Build declarations for the extracted imports
   const declLines: string[] = [];
-  for (const name of postalserviceBindings) {
-    declLines.push(`  const ${name} = (await import('postalservice')).${name};`);
+  for (const name of parcelyBindings) {
+    declLines.push(`  const ${name} = (await import('parcely')).${name};`);
   }
 
   // For zod, we just declare z as any since we don't have zod types
@@ -254,7 +254,7 @@ try {
     stdio: 'pipe',
     encoding: 'utf-8',
   });
-  console.log('All postalservice code snippets in the migration guide type-check successfully.');
+  console.log('All parcely code snippets in the migration guide type-check successfully.');
   process.exit(0);
 } catch (err: unknown) {
   const error = err as { stdout?: string; stderr?: string };

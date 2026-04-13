@@ -1,5 +1,5 @@
 /**
- * End-to-end smoke test for the built postalservice package.
+ * End-to-end smoke test for the built parcely package.
  *
  * Two scenarios:
  *   1. Hit https://httpbin.org/get and assert the envelope shape.
@@ -12,7 +12,7 @@
 import { createServer } from 'node:https'
 import { generateKeyPairSync, createSign, X509Certificate } from 'node:crypto'
 import type { AddressInfo } from 'node:net'
-import { createClient, HttpError } from '../packages/postalservice/dist/index.js'
+import { createClient, HttpError } from '../packages/parcely/dist/index.js'
 
 const ok = (label: string) => console.log(`  \x1b[32m✓\x1b[0m ${label}`)
 const fail = (label: string, err?: unknown) => {
@@ -29,7 +29,7 @@ async function scenario1(): Promise<void> {
   const http = createClient({ baseURL: 'https://httpbin.org', timeout: 15_000 })
   try {
     const res = await http.get<{ url: string; headers: Record<string, string> }>('/get', {
-      headers: { 'X-Smoke': 'postalservice' },
+      headers: { 'X-Smoke': 'parcely' },
     })
     if (res.status === 200) ok(`status 200`)
     else fail(`status was ${res.status}`)

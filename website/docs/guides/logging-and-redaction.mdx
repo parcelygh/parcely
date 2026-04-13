@@ -12,7 +12,7 @@ Log request and response details for debugging, with sensitive headers automatic
 ## Request/response logging interceptor
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -35,7 +35,7 @@ http.interceptors.response.use(
 
 ## Automatic redaction
 
-postalservice automatically redacts sensitive header values in:
+parcely automatically redacts sensitive header values in:
 
 - The `config` field of `HttpResponse` envelopes
 - The `config` field of `HttpError` objects
@@ -66,7 +66,7 @@ const http = createClient({
 
 ## Axios equivalent
 
-Axios does not redact sensitive headers in errors or responses. In postalservice, redaction is built in.
+Axios does not redact sensitive headers in errors or responses. In parcely, redaction is built in.
 
 ## Notes and gotchas
 

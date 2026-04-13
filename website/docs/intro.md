@@ -4,9 +4,9 @@ slug: /intro
 title: Introduction
 ---
 
-# Why postalservice?
+# Why parcely?
 
-**postalservice** is a fetch-based HTTP client for TypeScript and JavaScript. It gives you the ergonomic, batteries-included API you know from axios -- `createClient`, interceptors, typed responses, upload progress -- while fixing the security and architectural issues that have produced axios CVEs over the past several years.
+**parcely** is a fetch-based HTTP client for TypeScript and JavaScript. It gives you the ergonomic, batteries-included API you know from axios -- `createClient`, interceptors, typed responses, upload progress -- while fixing the security and architectural issues that have produced axios CVEs over the past several years.
 
 ## Design goals
 
@@ -15,12 +15,12 @@ title: Introduction
 - **Tree-shakeable.** Named exports only, `sideEffects: false`, conditional dynamic import for TLS. Ship only what you use.
 - **Universal runtime.** Targets modern browsers, Node 20+, Bun, and Deno.
 - **Validator extension point.** Opt-in runtime response validation via Standard Schema (Zod, Valibot, ArkType) or any `(input) => T` function. No validator runtime dependency.
-- **Monorepo from day one.** Core stays small. Companion subpackages (`@postalservice/auth-token`, `@postalservice/auth-redirect`) handle common auth patterns; further slots (retry, react, upload-node) are reserved for the future.
+- **Monorepo from day one.** Core stays small. Companion subpackages (`@parcely/auth-token`, `@parcely/auth-redirect`) handle common auth patterns; further slots (retry, react, upload-node) are reserved for the future.
 
 ## What it looks like
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://api.example.com',

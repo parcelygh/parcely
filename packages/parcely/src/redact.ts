@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// postalservice — config redaction
+// parcely — config redaction
 // ---------------------------------------------------------------------------
 
 import type { RequestConfig } from './types.js';

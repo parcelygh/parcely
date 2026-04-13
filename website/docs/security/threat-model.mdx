@@ -5,7 +5,7 @@ title: Threat model and defaults
 
 # Threat model and security defaults
 
-postalservice is designed with 13 security defaults that are enabled out of the box. These defaults address every class of vulnerability found in axios CVEs over the past several years.
+parcely is designed with 13 security defaults that are enabled out of the box. These defaults address every class of vulnerability found in axios CVEs over the past several years.
 
 ## Security defaults table
 
@@ -14,7 +14,7 @@ postalservice is designed with 13 security defaults that are enabled out of the 
 | 1 | Reject absolute URLs when `baseURL` is set | `allowAbsoluteUrls: false` | Prevents SSRF via base-URL override (CVE-2024-39338, CVE-2025-27152). URLs starting with `//`, `http:`, `https:`, etc. are rejected when a `baseURL` is configured. |
 | 2 | URI scheme allowlist | `allowedProtocols: ['http:', 'https:']` | Blocks `file:`, `data:`, `javascript:`, and other dangerous schemes before the request is made. |
 | 3 | Cross-origin redirect header stripping | Always on | When following redirects to a different origin, sensitive headers (`authorization`, `cookie`, `proxy-authorization`, `set-cookie`, `x-api-key`, and any user-defined `sensitiveHeaders`) are stripped. |
-| 4 | Manual redirect walk with `maxRedirects` | `maxRedirects: 5` | Redirects are followed manually (not by the browser/runtime), giving postalservice control over header stripping and redirect limits. |
+| 4 | Manual redirect walk with `maxRedirects` | `maxRedirects: 5` | Redirects are followed manually (not by the browser/runtime), giving parcely control over header stripping and redirect limits. |
 | 5 | Prototype-pollution-safe config merging | Always on | Config merging uses an explicit allowlist copy. `__proto__`, `constructor`, and `prototype` keys are stripped from nested objects (CVE-2024-57965). |
 | 6 | CRLF injection defense | Always on | Header names and values are validated via the native `Headers` API, which rejects `\r\n` sequences (ERR_CRLF_INJECTION). |
 | 7 | Optional request header allowlist | `allowedRequestHeaders: undefined` (opt-in) | When set, only listed header names are permitted. Unlisted headers throw `ERR_DISALLOWED_HEADER`. |
@@ -44,4 +44,4 @@ The following are intentionally out of scope for v1:
 - Host allowlists / blocklists
 - Request/response size limits
 - HSTS enforcement
-- Automatic retries (planned: `@postalservice/retry`)
+- Automatic retries (planned: `@parcely/retry`)

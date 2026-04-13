@@ -1,14 +1,14 @@
 ---
 sidebar_position: 10
-title: "@postalservice/auth-redirect"
+title: "@parcely/auth-redirect"
 ---
 
-# @postalservice/auth-redirect
+# @parcely/auth-redirect
 
 Redirect the browser to a login URL on 401/403.
 
 ```ts
-import { createAuthRedirect } from '@postalservice/auth-redirect'
+import { createAuthRedirect } from '@parcely/auth-redirect'
 ```
 
 ## createAuthRedirect(options)
@@ -47,8 +47,8 @@ This addon uses `window.location.href` to redirect. In non-browser environments 
 ## Example
 
 ```ts
-import { createClient } from 'postalservice'
-import { createAuthRedirect } from '@postalservice/auth-redirect'
+import { createClient } from 'parcely'
+import { createAuthRedirect } from '@parcely/auth-redirect'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -64,13 +64,13 @@ const redirect = createAuthRedirect({
 redirect.install(http)
 ```
 
-## Combining with @postalservice/auth-token
+## Combining with @parcely/auth-token
 
 Install auth-token **first**, then auth-redirect. The redirect fires only after the token refresh has failed:
 
 ```ts
-import { createAuthToken } from '@postalservice/auth-token'
-import { createAuthRedirect } from '@postalservice/auth-redirect'
+import { createAuthToken } from '@parcely/auth-token'
+import { createAuthRedirect } from '@parcely/auth-redirect'
 
 auth.install(http)       // first: tries to refresh the token
 redirect.install(http)   // second: redirects if refresh failed

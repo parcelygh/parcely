@@ -1,13 +1,13 @@
 // ---------------------------------------------------------------------------
-// @postalservice/auth-redirect — browser redirect interceptor for auth errors
+// @parcely/auth-redirect — browser redirect interceptor for auth errors
 // ---------------------------------------------------------------------------
 
 import type {
   Client,
   HttpResponse,
   InterceptorHandler,
-} from 'postalservice';
-import { HttpError } from 'postalservice';
+} from 'parcely';
+import { HttpError } from 'parcely';
 
 // ---- Public option types ---------------------------------------------------
 
@@ -78,7 +78,7 @@ export interface AuthRedirectHandle {
 
   /**
    * Attaches the response error interceptor to the given client.
-   * @param client - A postalservice {@link Client} instance.
+   * @param client - A parcely {@link Client} instance.
    */
   install(client: Client): void;
 }
@@ -101,8 +101,8 @@ export interface AuthRedirectHandle {
  *
  * @example
  * ```ts
- * import { createClient } from 'postalservice'
- * import { createAuthRedirect } from '\@postalservice/auth-redirect'
+ * import { createClient } from 'parcely'
+ * import { createAuthRedirect } from '\@parcely/auth-redirect'
  *
  * const http = createClient({ baseURL: 'https://api.example.com' })
  * const redirect = createAuthRedirect({ loginUrl: '/login' })
@@ -158,7 +158,7 @@ export function createAuthRedirect(opts: AuthRedirectOptions): AuthRedirectHandl
           if (!nonBrowserWarned) {
             nonBrowserWarned = true;
             console.warn(
-              '[@postalservice/auth-redirect] ignored in non-browser runtime',
+              '[@parcely/auth-redirect] ignored in non-browser runtime',
             );
           }
         }

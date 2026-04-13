@@ -7,13 +7,13 @@ title: Testing with stubbed fetch
 
 ## Use case
 
-Write unit tests for code that uses postalservice by stubbing or mocking `globalThis.fetch`.
+Write unit tests for code that uses parcely by stubbing or mocking `globalThis.fetch`.
 
 ## Vitest example
 
 ```ts
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 describe('UserService', () => {
   const http = createClient({ baseURL: 'https://api.example.com' })
@@ -62,7 +62,7 @@ describe('UserService', () => {
 ## Jest example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -89,11 +89,11 @@ test('fetches data', async () => {
 
 ## Axios equivalent
 
-In axios, you would use `axios-mock-adapter` or stub `axios.create`. In postalservice, you stub `globalThis.fetch` -- no adapter library needed.
+In axios, you would use `axios-mock-adapter` or stub `axios.create`. In parcely, you stub `globalThis.fetch` -- no adapter library needed.
 
 ## Notes and gotchas
 
-- postalservice always uses `globalThis.fetch`, so stubbing it is the most reliable approach.
+- parcely always uses `globalThis.fetch`, so stubbing it is the most reliable approach.
 - Return `new Response(body, init)` from your mock to match the fetch API contract.
-- Remember to set the `Content-Type` header in mock responses so that postalservice parses the body correctly.
+- Remember to set the `Content-Type` header in mock responses so that parcely parses the body correctly.
 - For integration tests, consider using MSW (Mock Service Worker) which intercepts fetch at a lower level.

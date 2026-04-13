@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// postalservice — TLS dispatcher (Node-only)
+// parcely — TLS dispatcher (Node-only)
 // ---------------------------------------------------------------------------
 
 import type { TlsConfig } from './types.js';
@@ -27,7 +27,7 @@ export async function resolveDispatcher(
     if (!browserWarned) {
       browserWarned = true;
       console.warn(
-        '[postalservice] TLS options are ignored in browser environments.',
+        '[parcely] TLS options are ignored in browser environments.',
       );
     }
     return undefined;
@@ -39,7 +39,7 @@ export async function resolveDispatcher(
     if (env !== 'production' && !insecureWarned) {
       insecureWarned = true;
       console.warn(
-        '[postalservice] TLS certificate verification is disabled (rejectUnauthorized: false). ' +
+        '[parcely] TLS certificate verification is disabled (rejectUnauthorized: false). ' +
           'This is unsafe outside of local development.',
       );
     }
@@ -61,7 +61,7 @@ export async function resolveDispatcher(
     // leave a rejectUnauthorized:false request being made WITH cert verification
     // still enforced, which is a confusing failure mode.
     throw new Error(
-      '[postalservice] tls options were provided but the `undici` package is not installed. ' +
+      '[parcely] tls options were provided but the `undici` package is not installed. ' +
         'Install it as a dependency to enable TLS customisation on Node:\n' +
         '    npm install undici\n' +
         "    # or: pnpm add undici  /  yarn add undici\n" +

@@ -1,14 +1,14 @@
-# @postalservice/auth-token
+# @parcely/auth-token
 
-Bearer / API-key / Basic token interceptor for [`postalservice`](https://www.npmjs.com/package/postalservice). Supports single-flight refresh-on-401 coalescing with bounded retry.
+Bearer / API-key / Basic token interceptor for [`parcely`](https://www.npmjs.com/package/parcely). Supports single-flight refresh-on-401 coalescing with bounded retry.
 
 ```sh
-npm install postalservice @postalservice/auth-token
+npm install parcely @parcely/auth-token
 ```
 
 ```ts
-import { createClient } from 'postalservice'
-import { createAuthToken } from '@postalservice/auth-token'
+import { createClient } from 'parcely'
+import { createAuthToken } from '@parcely/auth-token'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 

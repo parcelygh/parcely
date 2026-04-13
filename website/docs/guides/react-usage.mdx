@@ -7,14 +7,14 @@ title: React usage
 
 ## Use case
 
-Use postalservice in a React application, including custom hooks and integration with TanStack Query or SWR.
+Use parcely in a React application, including custom hooks and integration with TanStack Query or SWR.
 
 ## Custom hook
 
 ```tsx
 import { useState, useEffect } from 'react'
-import { createClient, isHttpError } from 'postalservice'
-import type { HttpResponse } from 'postalservice'
+import { createClient, isHttpError } from 'parcely'
+import type { HttpResponse } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -58,7 +58,7 @@ function UserProfile() {
 
 ```tsx
 import { useQuery } from '@tanstack/react-query'
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -77,7 +77,7 @@ function useUser(id: string) {
 
 ```tsx
 import useSWR from 'swr'
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -98,5 +98,5 @@ The patterns are the same. Replace `axios.get` with `http.get` and use `res.data
 ## Notes and gotchas
 
 - Always cancel requests on unmount using `AbortController` to prevent state updates on unmounted components.
-- A dedicated `@postalservice/react` package with `useHttp()` hooks is planned for the future.
-- postalservice's `signal` option integrates naturally with TanStack Query's `signal` parameter.
+- A dedicated `@parcely/react` package with `useHttp()` hooks is planned for the future.
+- parcely's `signal` option integrates naturally with TanStack Query's `signal` parameter.

@@ -5,7 +5,7 @@ import type {
   RequestConfig,
   HttpResponse,
   InterceptorHandler,
-} from 'postalservice';
+} from 'parcely';
 
 // ---------------------------------------------------------------------------
 // Mock Client factory
@@ -133,7 +133,7 @@ function createMockClient(
 }
 
 // ---------------------------------------------------------------------------
-// HttpError-like factory (structural — no runtime import from postalservice)
+// HttpError-like factory (structural — no runtime import from parcely)
 // ---------------------------------------------------------------------------
 
 function createHttpError(opts: {

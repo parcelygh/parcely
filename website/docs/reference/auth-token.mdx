@@ -1,14 +1,14 @@
 ---
 sidebar_position: 9
-title: "@postalservice/auth-token"
+title: "@parcely/auth-token"
 ---
 
-# @postalservice/auth-token
+# @parcely/auth-token
 
 Attach tokens to requests and optionally refresh on 401.
 
 ```ts
-import { createAuthToken } from '@postalservice/auth-token'
+import { createAuthToken } from '@parcely/auth-token'
 ```
 
 ## createAuthToken(options)
@@ -51,8 +51,8 @@ Creates an auth-token handler that can be installed on a client.
 ## Example
 
 ```ts
-import { createClient } from 'postalservice'
-import { createAuthToken } from '@postalservice/auth-token'
+import { createClient } from 'parcely'
+import { createAuthToken } from '@parcely/auth-token'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 const refreshClient = createClient({ baseURL: 'https://api.example.com' })

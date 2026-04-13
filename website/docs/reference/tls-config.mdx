@@ -23,12 +23,12 @@ interface TlsConfig {
 
 ## How it works
 
-When `tls` is set in `RequestConfig`, postalservice lazy-imports `undici` (built into Node 20+) and creates a custom `Agent` with the specified TLS options. This agent is passed to `fetch` as a dispatcher.
+When `tls` is set in `RequestConfig`, parcely lazy-imports `undici` (built into Node 20+) and creates a custom `Agent` with the specified TLS options. This agent is passed to `fetch` as a dispatcher.
 
 ## Example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 import { readFileSync } from 'node:fs'
 
 // Self-signed cert (dev only)

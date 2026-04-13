@@ -1,11 +1,11 @@
 /**
- * Tree-shake audit. A consumer that imports ONLY HttpError from postalservice
+ * Tree-shake audit. A consumer that imports ONLY HttpError from parcely
  * must not pull in request.ts, tls.ts, validate.ts, body.ts, progress.ts,
  * client.ts, interceptors.ts, or redact.ts.
  *
  * Strategy:
  *  1. Write a tiny consumer entry that imports { HttpError } only.
- *  2. Bundle it with esbuild against the built postalservice dist.
+ *  2. Bundle it with esbuild against the built parcely dist.
  *  3. Inspect the bundle metafile for forbidden module names.
  *  4. Sanity-check that HttpError itself IS in the bundle.
  */
@@ -39,7 +39,7 @@ const entryPath = join(tmpDir, 'entry.ts')
 writeFileSync(
   entryPath,
   [
-    `import { HttpError } from 'postalservice'`,
+    `import { HttpError } from 'parcely'`,
     `export function touch(): HttpError {`,
     `  return new HttpError('x', { code: 'ERR_NETWORK', config: {} as never })`,
     `}`,
@@ -62,7 +62,7 @@ const result = await build({
   absWorkingDir: repoRoot,
   nodePaths: [join(repoRoot, 'node_modules')],
   alias: {
-    postalservice: join(repoRoot, 'packages/postalservice/dist/index.js'),
+    parcely: join(repoRoot, 'packages/parcely/dist/index.js'),
   },
   write: true,
   logLevel: 'warning',
@@ -83,10 +83,10 @@ const outputInfo = result.metafile!.outputs[outfile.replace(repoRoot + '/', '')]
   ?? Object.values(result.metafile!.outputs)[0]
 
 console.log(`Bundle size: ${(bundleSrc.length / 1024).toFixed(2)} kB`)
-console.log(`Bytes-in-output per postalservice module:`)
+console.log(`Bytes-in-output per parcely module:`)
 const hits: string[] = []
 for (const [file, info] of Object.entries(outputInfo.inputs)) {
-  if (!file.includes('packages/postalservice/dist/')) continue
+  if (!file.includes('packages/parcely/dist/')) continue
   const base = file.slice(file.lastIndexOf('/') + 1)
   const bytes = info.bytesInOutput
   console.log(`  ${bytes.toString().padStart(5)} bytes  ${base}`)

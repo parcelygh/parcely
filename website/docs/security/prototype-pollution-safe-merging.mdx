@@ -9,9 +9,9 @@ title: Prototype pollution safe merging
 
 Prototype pollution occurs when an attacker injects properties like `__proto__`, `constructor`, or `prototype` into an object that gets merged into a shared prototype chain. In HTTP clients, this can happen during config merging. CVE-2024-57965 demonstrated this in axios.
 
-## How postalservice prevents it
+## How parcely prevents it
 
-postalservice's config merging (`mergeConfig`) uses an explicit allowlist copy. Only known `RequestConfig` keys are copied from the override object. Additionally, when merging nested objects (like `headers` or `params`), the following keys are stripped:
+parcely's config merging (`mergeConfig`) uses an explicit allowlist copy. Only known `RequestConfig` keys are copied from the override object. Additionally, when merging nested objects (like `headers` or `params`), the following keys are stripped:
 
 - `__proto__`
 - `constructor`

@@ -26,9 +26,9 @@ importers:
 
   packages/auth-redirect:
     devDependencies:
-      postalservice:
+      parcely:
         specifier: workspace:*
-        version: link:../postalservice
+        version: link:../parcely
       rimraf:
         specifier: ^6.1.3
         version: 6.1.3
@@ -41,9 +41,9 @@ importers:
 
   packages/auth-token:
     devDependencies:
-      postalservice:
+      parcely:
         specifier: workspace:*
-        version: link:../postalservice
+        version: link:../parcely
       rimraf:
         specifier: ^6.1.3
         version: 6.1.3
@@ -54,7 +54,7 @@ importers:
         specifier: ^3.2.1
         version: 3.2.4(@types/debug@4.1.13)(@types/node@25.6.0)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.21.0)
 
-  packages/postalservice:
+  packages/parcely:
     devDependencies:
       rimraf:
         specifier: ^6.1.3

@@ -1,12 +1,12 @@
 // ---------------------------------------------------------------------------
-// @postalservice/auth-redirect — tests
+// @parcely/auth-redirect — tests
 // ---------------------------------------------------------------------------
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createAuthRedirect } from './index.js';
 import type { AuthRedirectOptions } from './index.js';
-import { HttpError } from 'postalservice';
-import type { RequestConfig } from 'postalservice';
+import { HttpError } from 'parcely';
+import type { RequestConfig } from 'parcely';
 
 // ---- Helpers ---------------------------------------------------------------
 
@@ -245,7 +245,7 @@ describe('createAuthRedirect', () => {
       expect(() => redirect.response.rejected!(makeHttpError(401))).toThrow();
       expect(warnSpy).toHaveBeenCalledTimes(1);
       expect(warnSpy).toHaveBeenCalledWith(
-        '[@postalservice/auth-redirect] ignored in non-browser runtime',
+        '[@parcely/auth-redirect] ignored in non-browser runtime',
       );
 
       // Second call — no additional warn
@@ -298,7 +298,7 @@ describe('createAuthRedirect', () => {
       interceptors: {
         response: { use: useSpy },
       },
-    } as unknown as import('postalservice').Client;
+    } as unknown as import('parcely').Client;
 
     const redirect = createAuthRedirect({ loginUrl: '/login' });
     redirect.install(fakeClient);

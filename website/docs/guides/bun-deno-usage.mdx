@@ -7,12 +7,12 @@ title: Bun and Deno usage
 
 ## Use case
 
-Use postalservice in Bun or Deno applications.
+Use parcely in Bun or Deno applications.
 
 ## Bun
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -28,13 +28,13 @@ No special configuration needed. Bun provides `globalThis.fetch` natively.
 Install with:
 
 ```bash
-bun add postalservice
+bun add parcely
 ```
 
 ## Deno
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -48,7 +48,7 @@ console.log(data)
 Deno supports npm specifiers:
 
 ```ts
-import { createClient } from 'npm:postalservice'
+import { createClient } from 'npm:parcely'
 ```
 
 Or add to `deno.json`:
@@ -56,7 +56,7 @@ Or add to `deno.json`:
 ```json
 {
   "imports": {
-    "postalservice": "npm:postalservice"
+    "parcely": "npm:parcely"
   }
 }
 ```
@@ -69,4 +69,4 @@ The usage pattern is identical to axios in both runtimes. The only difference is
 
 - Both Bun and Deno provide `globalThis.fetch` and `AbortSignal.any` natively.
 - The `tls` option is Node-specific (it uses `undici` under the hood). In Bun and Deno, TLS configuration should be done via runtime-specific mechanisms.
-- postalservice's zero-dep design means there are no compatibility issues with alternative runtimes.
+- parcely's zero-dep design means there are no compatibility issues with alternative runtimes.

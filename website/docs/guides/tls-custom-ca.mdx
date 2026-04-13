@@ -12,7 +12,7 @@ Connect to servers signed by an internal certificate authority (Node.js only).
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 import { readFileSync } from 'node:fs'
 
 const http = createClient({
@@ -55,7 +55,7 @@ const http = axios.create({
   }),
 })
 
-// postalservice:
+// parcely:
 const http2 = createClient({
   baseURL: 'https://internal.corp.example.com',
   tls: {

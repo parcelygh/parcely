@@ -9,11 +9,11 @@ title: Auth refresh on 401
 
 When an API returns 401, automatically refresh the access token and retry the original request.
 
-## Using `@postalservice/auth-token` (recommended)
+## Using `@parcely/auth-token` (recommended)
 
 ```ts
-import { createClient } from 'postalservice'
-import { createAuthToken } from '@postalservice/auth-token'
+import { createClient } from 'parcely'
+import { createAuthToken } from '@parcely/auth-token'
 
 const refreshClient = createClient({ baseURL: 'https://api.example.com' })
 const http = createClient({ baseURL: 'https://api.example.com' })
@@ -41,7 +41,7 @@ Key behaviour:
 ## Hand-rolled interceptor recipe
 
 ```ts
-import { createClient, isHttpError } from 'postalservice'
+import { createClient, isHttpError } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -79,10 +79,10 @@ http.interceptors.response.use(undefined, async (err) => {
 
 ## Axios equivalent
 
-The axios pattern is essentially the same interceptor approach. `@postalservice/auth-token` removes the boilerplate.
+The axios pattern is essentially the same interceptor approach. `@parcely/auth-token` removes the boilerplate.
 
 ## Notes and gotchas
 
 - Use a **separate client** for the refresh call to avoid interceptor loops.
-- The `@postalservice/auth-token` addon handles single-flight coalescing and retry bounding automatically.
-- If you install both `@postalservice/auth-token` and `@postalservice/auth-redirect`, install auth-token first. The redirect runs after refresh has failed.
+- The `@parcely/auth-token` addon handles single-flight coalescing and retry bounding automatically.
+- If you install both `@parcely/auth-token` and `@parcely/auth-redirect`, install auth-token first. The redirect runs after refresh has failed.

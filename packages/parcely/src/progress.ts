@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// postalservice — progress tracking via ReadableStream wrapping
+// parcely — progress tracking via ReadableStream wrapping
 // ---------------------------------------------------------------------------
 
 import type { ProgressEvent } from './types.js';

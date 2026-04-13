@@ -1,5 +1,5 @@
 {
-  "name": "postalservice-monorepo",
+  "name": "parcely-monorepo",
   "private": true,
   "packageManager": "pnpm@10.22.0",
   "scripts": {

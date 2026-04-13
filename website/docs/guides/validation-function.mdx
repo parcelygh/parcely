@@ -12,7 +12,7 @@ Validate API responses using a simple function without any schema library.
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -40,12 +40,12 @@ const { data } = await http.get('/users/me', {
 
 ## How it works
 
-postalservice's `Validator<T>` type accepts `(input: unknown) => T` functions. The function receives the parsed response body. If it returns a value, that value becomes `data`. If it throws, postalservice wraps the error in `HttpError` with `code: 'ERR_VALIDATION'`.
+parcely's `Validator<T>` type accepts `(input: unknown) => T` functions. The function receives the parsed response body. If it returns a value, that value becomes `data`. If it throws, parcely wraps the error in `HttpError` with `code: 'ERR_VALIDATION'`.
 
 ## Error handling
 
 ```ts
-import { isHttpError } from 'postalservice'
+import { isHttpError } from 'parcely'
 
 try {
   await http.get('/users/me', { validate: validateUser })
@@ -65,7 +65,7 @@ Axios does not support validation. You would validate after the response:
 const { data } = await http.get('/users/me')
 const user = validateUser(data) // manual
 
-// postalservice (integrated):
+// parcely (integrated):
 const { data: user } = await http.get('/users/me', { validate: validateUser })
 ```
 

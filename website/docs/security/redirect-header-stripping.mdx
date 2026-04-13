@@ -9,9 +9,9 @@ title: Redirect header stripping
 
 When an HTTP client follows a redirect from `origin-a.com` to `origin-b.com`, credentials meant for origin A (cookies, authorization tokens) can leak to origin B. This is the class of vulnerability in CVE-2023-45857, where axios leaked the `XSRF-TOKEN` cookie to third-party hosts on redirect.
 
-## How postalservice prevents it
+## How parcely prevents it
 
-postalservice follows redirects manually (using `redirect: 'manual'` on fetch and walking the redirect chain). On each hop, if the new URL has a different origin from the previous one, all sensitive headers are stripped from the forwarded request.
+parcely follows redirects manually (using `redirect: 'manual'` on fetch and walking the redirect chain). On each hop, if the new URL has a different origin from the previous one, all sensitive headers are stripped from the forwarded request.
 
 ### Default sensitive headers
 
@@ -24,7 +24,7 @@ postalservice follows redirects manually (using `redirect: 'manual'` on fetch an
 ### Customising the list
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://api.example.com',

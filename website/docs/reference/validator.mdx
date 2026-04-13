@@ -16,7 +16,7 @@ type Validator<T> =
 
 ## Accepted shapes
 
-postalservice checks the validator in this order at runtime:
+parcely checks the validator in this order at runtime:
 
 | Shape | Detection | Examples |
 |---|---|---|
@@ -26,7 +26,7 @@ postalservice checks the validator in this order at runtime:
 
 ## StandardSchemaV1
 
-postalservice includes a type-only definition of the Standard Schema v1 interface. No runtime dependency is needed.
+parcely includes a type-only definition of the Standard Schema v1 interface. No runtime dependency is needed.
 
 ```ts
 interface StandardSchemaV1<Input = unknown, Output = Input> {
@@ -74,7 +74,7 @@ namespace StandardSchemaV1 {
 
 ## Error behaviour
 
-When validation fails, postalservice throws `HttpError` with:
+When validation fails, parcely throws `HttpError` with:
 - `code: 'ERR_VALIDATION'`
 - `response`: the original `HttpResponse` envelope
 - `cause`: the error thrown by the validator
@@ -82,7 +82,7 @@ When validation fails, postalservice throws `HttpError` with:
 ## Example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 import { z } from 'zod'
 
 const http = createClient({ baseURL: 'https://api.example.com' })

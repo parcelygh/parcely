@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// postalservice — body preparation
+// parcely — body preparation
 // ---------------------------------------------------------------------------
 
 import type { FormDataSerializer, RequestConfig } from './types.js';

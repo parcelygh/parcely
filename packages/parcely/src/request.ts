@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// postalservice — core request orchestrator (11-step lifecycle)
+// parcely — core request orchestrator (11-step lifecycle)
 // ---------------------------------------------------------------------------
 
 import type { RequestConfig, HttpResponse } from './types.js';

@@ -7,12 +7,12 @@ title: Response types
 
 ## Use case
 
-Control how the response body is parsed. By default postalservice returns parsed JSON, but you can request text, binary data, or blobs.
+Control how the response body is parsed. By default parcely returns parsed JSON, but you can request text, binary data, or blobs.
 
 ## JSON (default)
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -20,7 +20,7 @@ const { data } = await http.get('/users/me')
 // data is the parsed JSON object
 ```
 
-postalservice is content-type-aware: if the response `Content-Type` is not a JSON type, the body is returned as raw text instead of crashing with a `SyntaxError`.
+parcely is content-type-aware: if the response `Content-Type` is not a JSON type, the body is returned as raw text instead of crashing with a `SyntaxError`.
 
 ## Text
 
@@ -49,14 +49,14 @@ const { data } = await http.get('/document.pdf', { responseType: 'blob' })
 // axios:
 const { data } = await http.get('/file', { responseType: 'arraybuffer' })
 
-// postalservice (identical):
+// parcely (identical):
 const { data: d } = await http.get('/file', { responseType: 'arraybuffer' })
 ```
 
-Both libraries support `'json'`, `'text'`, `'arraybuffer'`, and `'blob'`. Axios additionally supports `'stream'` (Node) and `'document'` (browser DOM), which postalservice does not provide.
+Both libraries support `'json'`, `'text'`, `'arraybuffer'`, and `'blob'`. Axios additionally supports `'stream'` (Node) and `'document'` (browser DOM), which parcely does not provide.
 
 ## Notes and gotchas
 
 - The `responseType` type is `'json' | 'text' | 'arraybuffer' | 'blob'`.
-- When `responseType` is `'json'` (default), postalservice sniffs the `Content-Type` header. If it does not indicate JSON, the response is returned as text to avoid parse errors.
-- If JSON parsing fails even with a JSON content type, postalservice throws `HttpError` with `code: 'ERR_PARSE'`.
+- When `responseType` is `'json'` (default), parcely sniffs the `Content-Type` header. If it does not indicate JSON, the response is returned as text to avoid parse errors.
+- If JSON parsing fails even with a JSON content type, parcely throws `HttpError` with `code: 'ERR_PARSE'`.

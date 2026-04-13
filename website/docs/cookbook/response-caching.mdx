@@ -12,8 +12,8 @@ Cache GET responses in memory to avoid redundant network calls within a time win
 ## Simple LRU cache recipe
 
 ```ts
-import { createClient } from 'postalservice'
-import type { HttpResponse } from 'postalservice'
+import { createClient } from 'parcely'
+import type { HttpResponse } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 

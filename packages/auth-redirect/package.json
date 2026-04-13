@@ -1,10 +1,10 @@
 {
-  "name": "@postalservice/auth-redirect",
+  "name": "@parcely/auth-redirect",
   "version": "0.1.0",
-  "description": "Browser-side login-redirect interceptor for postalservice. Redirects on 401/403 with optional return_to preservation and cooldown debounce.",
+  "description": "Browser-side login-redirect interceptor for parcely. Redirects on 401/403 with optional return_to preservation and cooldown debounce.",
   "license": "MIT",
   "keywords": [
-    "postalservice",
+    "parcely",
     "auth",
     "redirect",
     "login",
@@ -37,10 +37,10 @@
     "test:watch": "vitest"
   },
   "peerDependencies": {
-    "postalservice": "workspace:*"
+    "parcely": "workspace:*"
   },
   "devDependencies": {
-    "postalservice": "workspace:*",
+    "parcely": "workspace:*",
     "rimraf": "^6.1.3",
     "typescript": "^6.0.2",
     "vitest": "^3.2.1"

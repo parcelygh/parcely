@@ -1,9 +1,9 @@
-# postalservice
+# parcely
 
 A zero-dependency, fetch-based HTTP client with axios-like ergonomics and a secure-by-default posture.
 
 ```ts
-import { createClient, HttpError } from 'postalservice'
+import { createClient, HttpError } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com', timeout: 5_000 })
 
@@ -29,12 +29,12 @@ try {
 
 | Package | Description |
 |---|---|
-| [`postalservice`](./packages/postalservice) | Core HTTP client. |
-| [`@postalservice/auth-token`](./packages/auth-token) | Bearer / API-key / Basic token interceptor with single-flight refresh-on-401. |
-| [`@postalservice/auth-redirect`](./packages/auth-redirect) | Browser 401/403 → login redirect interceptor with `return_to` preservation and cooldown debounce. |
+| [`parcely`](./packages/parcely) | Core HTTP client. |
+| [`@parcely/auth-token`](./packages/auth-token) | Bearer / API-key / Basic token interceptor with single-flight refresh-on-401. |
+| [`@parcely/auth-redirect`](./packages/auth-redirect) | Browser 401/403 → login redirect interceptor with `return_to` preservation and cooldown debounce. |
 | [`website`](./website) | Docusaurus documentation site — axios migration guide, how-tos, security pages, API reference. |
 
-Reserved for future releases: `@postalservice/retry`, `@postalservice/react`, `@postalservice/upload-node`.
+Reserved for future releases: `@parcely/retry`, `@parcely/react`, `@parcely/upload-node`.
 
 ## Documentation
 
@@ -72,9 +72,9 @@ Hits `https://httpbin.org/get` and spins up a local self-signed HTTPS server to 
 
 ### Layout
 
-- `packages/postalservice` — core library
-- `packages/auth-token` — `@postalservice/auth-token`
-- `packages/auth-redirect` — `@postalservice/auth-redirect`
+- `packages/parcely` — core library
+- `packages/auth-token` — `@parcely/auth-token`
+- `packages/auth-redirect` — `@parcely/auth-redirect`
 - `website` — Docusaurus docs
 - `scripts` — doc coverage, doc-snippet type-checker, tree-shake audit, smoke test
 

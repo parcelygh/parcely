@@ -41,7 +41,7 @@ const features: { title: string; description: string }[] = [
   },
 ];
 
-const demoCode = `import { createClient } from 'postalservice'
+const demoCode = `import { createClient } from 'parcely'
 import { z } from 'zod'
 
 const http = createClient({
@@ -128,7 +128,7 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="Zero-dep fetch with axios ergonomics"
-      description="postalservice is a fetch-based HTTP client for TypeScript with an axios-like API, zero runtime dependencies, and secure defaults.">
+      description="parcely is a fetch-based HTTP client for TypeScript with an axios-like API, zero runtime dependencies, and secure defaults.">
       <HomepageHeader />
       <main>
         <FeaturesSection />

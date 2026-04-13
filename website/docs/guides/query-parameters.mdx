@@ -12,7 +12,7 @@ Append query parameters to the URL from a typed object, including arrays and nes
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -45,7 +45,7 @@ await http.get('/filter', {
 // axios:
 await http.get('/search', { params: { q: 'hello', page: 1 } })
 
-// postalservice (identical):
+// parcely (identical):
 await http.get('/search', { params: { q: 'hello', page: 1 } })
 ```
 
@@ -54,4 +54,4 @@ await http.get('/search', { params: { q: 'hello', page: 1 } })
 - `params` is typed as `Record<string, unknown>`.
 - `null` and `undefined` values are omitted from the query string.
 - Parameters are appended to any query string already present in the `url`.
-- postalservice does not provide a `paramsSerializer` config option. The built-in serialiser handles all common cases. If you need custom serialisation, build the query string yourself and append it to the URL.
+- parcely does not provide a `paramsSerializer` config option. The built-in serialiser handles all common cases. If you need custom serialisation, build the query string yourself and append it to the URL.

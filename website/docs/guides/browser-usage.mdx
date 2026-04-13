@@ -7,12 +7,12 @@ title: Browser usage
 
 ## Use case
 
-Use postalservice in a web application (React, Vue, Svelte, vanilla JS, etc.).
+Use parcely in a web application (React, Vue, Svelte, vanilla JS, etc.).
 
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -22,25 +22,25 @@ const http = createClient({
 const { data } = await http.get('/users/me')
 ```
 
-postalservice works in any browser with `globalThis.fetch` (all modern browsers).
+parcely works in any browser with `globalThis.fetch` (all modern browsers).
 
 ## CORS considerations
 
-When making requests to a different origin, standard CORS rules apply. The browser enforces these at the `fetch` level. postalservice does not add any CORS-related headers automatically.
+When making requests to a different origin, standard CORS rules apply. The browser enforces these at the `fetch` level. parcely does not add any CORS-related headers automatically.
 
 If you need to send cookies cross-origin, use a request interceptor:
 
 ```ts
 http.interceptors.request.use((config) => ({
   ...config,
-  // Note: this is conceptual -- postalservice passes config through to fetch.
+  // Note: this is conceptual -- parcely passes config through to fetch.
   // For credentials, handle at the fetch level via interceptors.
 }))
 ```
 
 ## Tree-shaking
 
-postalservice is tree-shakeable (`sideEffects: false`, named exports only). Bundlers like Webpack, Rollup, esbuild, and Vite will drop unused code paths (e.g., TLS resolution and Node-specific imports are eliminated in browser bundles).
+parcely is tree-shakeable (`sideEffects: false`, named exports only). Bundlers like Webpack, Rollup, esbuild, and Vite will drop unused code paths (e.g., TLS resolution and Node-specific imports are eliminated in browser bundles).
 
 ## Axios equivalent
 
@@ -49,8 +49,8 @@ postalservice is tree-shakeable (`sideEffects: false`, named exports only). Bund
 import axios from 'axios'
 const http = axios.create({ baseURL: 'https://api.example.com' })
 
-// postalservice (same pattern):
-import { createClient } from 'postalservice'
+// parcely (same pattern):
+import { createClient } from 'parcely'
 const http2 = createClient({ baseURL: 'https://api.example.com' })
 ```
 
@@ -59,4 +59,4 @@ const http2 = createClient({ baseURL: 'https://api.example.com' })
 - Upload progress on Safari and Firefox is limited to a terminal callback (see [Upload progress](/docs/guides/upload-progress)).
 - Download progress works in all browsers.
 - The `tls` option is ignored in browsers (with a one-shot `console.warn`).
-- postalservice does not provide `withCredentials` or XSRF token handling. Use request interceptors for these patterns.
+- parcely does not provide `withCredentials` or XSRF token handling. Use request interceptors for these patterns.

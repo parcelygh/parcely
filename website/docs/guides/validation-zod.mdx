@@ -12,7 +12,7 @@ Validate API responses at runtime against a Zod schema, getting both type safety
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 import { z } from 'zod'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
@@ -31,9 +31,9 @@ const { data } = await http.get('/users/me', {
 
 ## How it works
 
-postalservice accepts any Standard Schema v1 validator in the `validate` option. Zod 3.24+ implements Standard Schema, so schemas work out of the box with no adapter.
+parcely accepts any Standard Schema v1 validator in the `validate` option. Zod 3.24+ implements Standard Schema, so schemas work out of the box with no adapter.
 
-When validation fails, postalservice throws `HttpError` with:
+When validation fails, parcely throws `HttpError` with:
 - `code: 'ERR_VALIDATION'`
 - `response`: the original response envelope
 - `cause`: the validation error from Zod
@@ -41,7 +41,7 @@ When validation fails, postalservice throws `HttpError` with:
 ## Error handling
 
 ```ts
-import { isHttpError } from 'postalservice'
+import { isHttpError } from 'parcely'
 
 try {
   await http.get('/users/me', { validate: UserSchema })
@@ -55,11 +55,11 @@ try {
 
 ## Axios equivalent
 
-Axios does not have built-in validation. Libraries like `axios-zod` add it. In postalservice, it is a first-class feature.
+Axios does not have built-in validation. Libraries like `axios-zod` add it. In parcely, it is a first-class feature.
 
 ## Notes and gotchas
 
-- Zod is a **dev/runtime dependency of your app**, not of postalservice. postalservice has zero runtime dependencies.
+- Zod is a **dev/runtime dependency of your app**, not of parcely. parcely has zero runtime dependencies.
 - Validation runs **after** the response body is parsed and **before** the response envelope is returned.
 - The `Validator<T>` type accepts Standard Schema v1 objects, `{ parse(input: unknown): T }` objects, or `(input: unknown) => T` functions.
 - For Zod versions before 3.24 (no Standard Schema), the `.parse()` method shape is also supported.

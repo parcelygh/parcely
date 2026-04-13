@@ -12,7 +12,7 @@ Cancel in-flight requests -- for example, when a user navigates away or types a 
 ## Smallest working example
 
 ```ts
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -33,7 +33,7 @@ When aborted, the request throws `HttpError` with `code: 'ERR_ABORTED'`.
 ## Handling cancellation
 
 ```ts
-import { isHttpError } from 'postalservice'
+import { isHttpError } from 'parcely'
 
 try {
   await http.get('/data', { signal: controller.signal })
@@ -48,7 +48,7 @@ try {
 
 ```tsx
 import { useEffect, useState } from 'react'
-import { createClient } from 'postalservice'
+import { createClient } from 'parcely'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -75,13 +75,13 @@ const controller = new AbortController()
 await http.get('/data', { signal: controller.signal })
 controller.abort()
 
-// postalservice (identical):
+// parcely (identical):
 const controller2 = new AbortController()
 await http.get('/data', { signal: controller2.signal })
 controller2.abort()
 ```
 
-postalservice does not support the legacy axios `CancelToken` API. Use `AbortController` instead.
+parcely does not support the legacy axios `CancelToken` API. Use `AbortController` instead.
 
 ## Notes and gotchas
 

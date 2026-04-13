@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// postalservice — HttpError and isHttpError
+// parcely — HttpError and isHttpError
 // ---------------------------------------------------------------------------
 
 import type { HttpResponse, RequestConfig } from './types.js';
