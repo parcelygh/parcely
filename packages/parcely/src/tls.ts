@@ -45,21 +45,40 @@ export async function resolveDispatcher(
     }
   }
 
+  let undici: { Agent: new (opts: unknown) => unknown };
   try {
-    // Dynamic import — only resolves in Node environments with undici available
-    const undici = await (Function('return import("undici")')() as Promise<{ Agent: new (opts: unknown) => unknown }>);
-    const Agent = undici.Agent;
-    return new Agent({
-      connect: {
-        rejectUnauthorized: tls.rejectUnauthorized,
-        ca: tls.ca,
-      },
-    });
+    // Hide the import specifier from bundlers' static analysis by routing
+    // through a variable. Most bundlers (esbuild, Rollup, Webpack) resolve
+    // dynamic-import specifiers only when they are string literals; a
+    // variable defeats that pass and leaves the import as a true runtime
+    // operation.
+    //
+    // Why we hide it:
+    //   - undici is a Node-only optional dep. Browser consumers MUST NOT
+    //     have it pulled into their bundle even when their code path can't
+    //     reach this function. Bundlers attempt to resolve all literal
+    //     specifiers up-front, and undici's deep `node:*` requires would
+    //     blow up a browser build.
+    //
+    // Why not `Function('return import("undici")')()`:
+    //   - requires `unsafe-eval` CSP
+    //   - tripped by security scanners
+    //   - same effect but uglier and more dangerous than this variable.
+    //
+    // The browser path above (process.release.name !== 'node') already
+    // short-circuits before this line, so no browser runtime ever attempts
+    // the import — and the variable trick keeps bundlers from attempting
+    // it at build time either.
+    const moduleName = 'undici';
+    undici = (await import(moduleName)) as unknown as {
+      Agent: new (opts: unknown) => unknown;
+    };
   } catch {
-    // undici is an optionalDependency; on some platforms (or after a --no-optional
-    // install) it won't be present. Be loud — silently ignoring TLS config would
-    // leave a rejectUnauthorized:false request being made WITH cert verification
-    // still enforced, which is a confusing failure mode.
+    // undici is an optionalDependency; on some platforms (or after a
+    // --no-optional install) it won't be present. Be loud — silently
+    // ignoring TLS config would leave a rejectUnauthorized:false request
+    // being made WITH cert verification still enforced, which is a
+    // confusing failure mode.
     throw new Error(
       '[parcely] tls options were provided but the `undici` package is not installed. ' +
         'Install it as a dependency to enable TLS customisation on Node:\n' +
@@ -68,6 +87,14 @@ export async function resolveDispatcher(
         'If you do not need TLS customisation, remove the `tls` option from your client config.',
     );
   }
+
+  const Agent = undici.Agent;
+  return new Agent({
+    connect: {
+      rejectUnauthorized: tls.rejectUnauthorized,
+      ca: tls.ca,
+    },
+  });
 }
 
 /**

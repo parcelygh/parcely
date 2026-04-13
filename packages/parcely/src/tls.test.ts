@@ -82,20 +82,32 @@ describe('resolveDispatcher', () => {
   });
 
   it('throws an actionable error when undici is not installed', async () => {
-    // Simulate missing undici by shadowing the dynamic import. The current
-    // process MAY have undici installed (optionalDependency), so we stub
-    // Function() to produce an import that rejects with ERR_MODULE_NOT_FOUND.
-    const origFunction = globalThis.Function;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (globalThis as any).Function = function FakeFn(_body: string) {
-      return () => Promise.reject(Object.assign(new Error("Cannot find package 'undici'"), { code: 'ERR_MODULE_NOT_FOUND' }));
-    } as unknown as typeof Function;
+    // Simulate missing undici via vi.doMock. The mock is non-hoisted, scoped
+    // to this test, and is reset in the finally. resolveDispatcher uses a
+    // lazy `await import('undici')`, so the mocked rejection is what it sees
+    // after we reset module cache and re-import the module under test.
+    vi.resetModules();
+    vi.doMock('undici', () => {
+      throw Object.assign(new Error("Cannot find package 'undici'"), {
+        code: 'ERR_MODULE_NOT_FOUND',
+      });
+    });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
     try {
-      _resetTlsWarnings();
-      await expect(resolveDispatcher({ rejectUnauthorized: false })).rejects.toThrow(/undici.*not installed/i);
+      // Re-import the module so it picks up the mocked undici on its lazy
+      // dynamic import. Top-of-file imports are bound to the original,
+      // un-mocked instance, so we cannot use them here.
+      const { resolveDispatcher: rd, _resetTlsWarnings: rw } = await import(
+        './tls.js'
+      );
+      rw();
+      await expect(rd({ rejectUnauthorized: false })).rejects.toThrow(
+        /undici.*not installed/i,
+      );
     } finally {
-      globalThis.Function = origFunction;
+      vi.doUnmock('undici');
+      vi.resetModules();
       warnSpy.mockRestore();
     }
   });

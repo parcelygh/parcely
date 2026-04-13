@@ -174,6 +174,14 @@ export function createAuthToken(opts: AuthTokenOptions): AuthTokenHandle {
   const requestInterceptor: NonNullable<
     InterceptorHandler<RequestConfig>['fulfilled']
   > = async (config: RequestConfig): Promise<RequestConfig> => {
+    // If this is a retry from our own response interceptor, the new token is
+    // already on `config.headers` — re-running `getToken()` here could read a
+    // stale value from the user's token store (race against the just-completed
+    // refresh) and clobber the fresh header. Pass through untouched.
+    if ((config as RetryableConfig)._retry) {
+      return config;
+    }
+
     // If the caller explicitly set the header, respect it
     if (hasHeader(config.headers, header)) {
       return config;

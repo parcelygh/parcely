@@ -276,6 +276,32 @@ describe('createAuthToken', () => {
       // headers should be unchanged (undefined in this case)
       expect(config.headers).toBeUndefined();
     });
+
+    it('skips getToken on retry config (_retry: true) — preserves caller-supplied header', async () => {
+      // The response interceptor sets `_retry: true` and writes the freshly
+      // refreshed token onto config.headers before re-issuing the request.
+      // The request interceptor must NOT call getToken() again — otherwise
+      // it could read a stale token from the user's store (race against the
+      // just-completed refresh) and clobber the new header.
+      let getTokenCalls = 0;
+      const auth = createAuthToken({
+        getToken: () => {
+          getTokenCalls++;
+          return 'STALE_TOKEN';
+        },
+      });
+
+      const config = await auth.request({
+        url: '/api',
+        headers: { Authorization: 'Bearer FRESH_TOKEN' },
+        // marker the response-error interceptor sets on retry
+        _retry: true,
+      } as RequestConfig & { _retry: boolean });
+
+      expect(getTokenCalls).toBe(0);
+      const headers = config.headers as Record<string, string>;
+      expect(headers['Authorization']).toBe('Bearer FRESH_TOKEN');
+    });
   });
 
   // ---- Response error interceptor -----------------------------------------

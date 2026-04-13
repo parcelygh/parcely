@@ -146,7 +146,9 @@ function appendToFormData(
           break;
         case 'brackets':
         default:
-          key = prefix ? `${prefix}[${i}]` : String(i);
+          // axios-compatible brackets: append `[]` rather than an index, so
+          // `tags: ['a', 'b']` becomes `tags[]=a&tags[]=b` semantically.
+          key = prefix ? `${prefix}[]` : String(i);
           break;
       }
       appendToFormData(fd, data[i], key, serializer);

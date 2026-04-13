@@ -163,6 +163,22 @@ export async function send<T = unknown>(
 
       const redirectUrl = new URL(location, currentUrl);
 
+      // Re-check protocol on the redirect target — a 302 from https:// to
+      // file:///etc/passwd (or any non-allowlisted scheme) must be rejected
+      // pre-flight, not delegated to fetch's runtime behaviour.
+      const allowedProtocols = config.allowedProtocols ?? ['http:', 'https:'];
+      if (!allowedProtocols.includes(redirectUrl.protocol)) {
+        await response.body?.cancel().catch(() => {});
+        throw new HttpError(
+          `Redirect target uses disallowed protocol: ${redirectUrl.protocol}`,
+          {
+            code: 'ERR_DISALLOWED_PROTOCOL',
+            config: redactConfig(config, config.sensitiveHeaders),
+            status: response.status,
+          },
+        );
+      }
+
       // Cross-origin check: strip sensitive headers on cross-origin hops
       const originalOrigin = new URL(currentUrl).origin;
       const redirectOrigin = redirectUrl.origin;
@@ -184,6 +200,18 @@ export async function send<T = unknown>(
         redirectInit.method = 'GET';
         delete redirectInit.body;
         delete redirectInit.duplex;
+      } else {
+        // 307/308 — preserve method AND body. The original `fetchInit.body`
+        // may be a one-shot ReadableStream that the first fetch consumed
+        // (FormData materialised via `new Response(formData).body` is the
+        // canonical case). Re-prepare from the user's original `config.body`
+        // so the next fetch gets a fresh stream / multipart boundary.
+        if (config.body !== undefined && config.body !== null) {
+          const reprepared = prepareBody(config.body, config);
+          if (reprepared.body !== undefined) {
+            redirectInit.body = reprepared.body as BodyInit;
+          }
+        }
       }
 
       response = await fetch(currentUrl, redirectInit as RequestInit);
@@ -230,7 +258,12 @@ export async function send<T = unknown>(
 
     const responseType = config.responseType ?? 'json';
 
-    if (responseType === 'json') {
+    if (responseType === 'stream') {
+      // Hand the user the un-consumed (optionally progress-wrapped) stream.
+      // Validation is meaningless here — we cannot inspect bytes without
+      // consuming them — so `validate` is silently skipped for this mode.
+      data = bodyStream;
+    } else if (responseType === 'json') {
       // Content-type sniff: only parse as JSON if content-type is JSON-ish
       const ct = response.headers.get('content-type') ?? '';
       if (bodyStream) {
@@ -285,8 +318,9 @@ export async function send<T = unknown>(
     });
   }
 
-  // Step 7: run validator if configured
-  if (config.validate) {
+  // Step 7: run validator if configured (skipped for stream responseType,
+  // which by definition hasn't read the body yet — see Section 6).
+  if (config.validate && config.responseType !== 'stream') {
     data = await runValidator(
       data,
       config.validate,

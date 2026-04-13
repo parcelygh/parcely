@@ -194,30 +194,68 @@ describe('Security Defenses', () => {
     }
   });
 
-  // Row 10: Raw Response never exposed
+  // Row 10: Raw Response never exposed — exhaustively verify NO envelope
+  // property (or response.config) is or wraps a fetch Response. A raw Response
+  // would let callers re-read the body (double-read errors) or leak streams.
   it('Row 10: raw Response is not exposed in envelope', async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ id: 1 }));
 
     const ctx = makeContext();
     const result = await send({ url: 'https://api.example.com/data' }, ctx);
 
-    // Envelope should have data, status, statusText, headers, config
-    // but NOT the raw Response object
+    // Top-level envelope shape
     expect(result).toHaveProperty('data');
     expect(result).toHaveProperty('status');
     expect(result).toHaveProperty('statusText');
     expect(result).toHaveProperty('headers');
     expect(result).toHaveProperty('config');
-    // The response object itself should not be a Response instance at the top level
     expect(result).not.toBeInstanceOf(Response);
+
+    // No envelope property is a Response instance
+    for (const value of Object.values(result)) {
+      expect(value).not.toBeInstanceOf(Response);
+    }
+
+    // The envelope's `config` (and its nested headers/body) is also not a
+    // Response — guards against accidental leakage through the redaction path.
+    for (const value of Object.values(result.config)) {
+      expect(value).not.toBeInstanceOf(Response);
+    }
+
+    // `headers` is a native Headers, not a Response
+    expect(result.headers).toBeInstanceOf(Headers);
+
+    // The same exhaustive check on a thrown error envelope
+    fetchMock.mockResolvedValueOnce(jsonResponse({ err: 'x' }, { status: 500 }));
+    try {
+      await send({ url: 'https://api.example.com/x' }, ctx);
+      expect.unreachable('should have thrown');
+    } catch (e) {
+      const err = e as HttpError;
+      expect(err.response).toBeDefined();
+      for (const value of Object.values(err.response!)) {
+        expect(value).not.toBeInstanceOf(Response);
+      }
+    }
   });
 
-  // Row 11: tls.rejectUnauthorized=false emits one-shot console.warn (non-prod)
+  // Row 11: tls.rejectUnauthorized=false emits one-shot console.warn (non-prod).
+  // The detailed permutations live in tls.test.ts; here we assert the warn
+  // actually fires through the full request pipeline. Without `undici`
+  // available in this test process, resolveDispatcher throws an actionable
+  // error AFTER firing the insecure-TLS warn — both behaviours are real.
   it('Row 11: TLS rejectUnauthorized=false warns in non-prod', async () => {
-    // This test is covered more thoroughly in tls.test.ts
-    // Here we verify the integration: send with tls config does not crash
     fetchMock.mockResolvedValueOnce(jsonResponse({ ok: true }));
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    // Reset the one-shot flag so this test sees a fresh warn regardless of
+    // ordering with other tests that touched resolveDispatcher.
+    const { _resetTlsWarnings } = await import('./tls.js');
+    _resetTlsWarnings();
+
+    // Pin NODE_ENV to development so the warn is allowed to fire.
+    const originalNodeEnv = process.env['NODE_ENV'];
+    process.env['NODE_ENV'] = 'development';
 
     const ctx = makeContext();
     try {
@@ -229,12 +267,20 @@ describe('Security Defenses', () => {
         ctx,
       );
     } catch {
-      // May fail due to undici import issues in test env — that's fine
+      // Expected when undici is not installed in the test runner — the warn
+      // still fires before the throw. The genuine integration is covered by
+      // scripts/smoke.ts against a real self-signed server.
+    } finally {
+      if (originalNodeEnv === undefined) delete process.env['NODE_ENV'];
+      else process.env['NODE_ENV'] = originalNodeEnv;
     }
 
+    const insecureWarns = warnSpy.mock.calls.filter((c) =>
+      String(c[0]).includes('rejectUnauthorized'),
+    );
+    expect(insecureWarns).toHaveLength(1);
+
     warnSpy.mockRestore();
-    // Verify warn was called (either for TLS or for undici import)
-    // The detailed assertion is in tls.test.ts
   });
 
   // Row 12: Sensitive header redaction on envelope & thrown errors

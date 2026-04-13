@@ -76,9 +76,12 @@ describe('prepareBody', () => {
     const fd = await resp.formData();
     expect(fd.get('name')).toBe('test');
     expect(fd.get('avatar')).toBeInstanceOf(Blob);
-    // brackets serializer: tags[0], tags[1]
-    expect(fd.get('tags[0]')).toBe('a');
-    expect(fd.get('tags[1]')).toBe('b');
+    // brackets serializer (axios-compatible): tags[]=a, tags[]=b — both
+    // entries appear under the same `tags[]` key, retrievable via getAll.
+    expect(fd.getAll('tags[]')).toEqual(['a', 'b']);
+    // And the indexed form (`tags[0]`) must NOT exist — that's the indices
+    // serializer's behaviour.
+    expect(fd.get('tags[0]')).toBeNull();
   });
 
   it('auto-converts with indices serializer', async () => {

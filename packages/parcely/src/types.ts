@@ -28,7 +28,17 @@ export type FormDataSerializer = 'brackets' | 'indices' | 'repeat';
 
 // ---- Response type --------------------------------------------------------
 
-export type ResponseType = 'json' | 'text' | 'arraybuffer' | 'blob';
+/**
+ * Determines how the response body is delivered as `data`.
+ *
+ * - `'json'` (default) — content-type-sniffed; falls back to text on non-JSON
+ * - `'text'` — UTF-8 decoded string
+ * - `'arraybuffer'` — raw bytes as `ArrayBuffer`
+ * - `'blob'` — `Blob` instance (re-streamable, typed by content-type)
+ * - `'stream'` — the raw `ReadableStream<Uint8Array> | null`, un-consumed.
+ *   Skips JSON parsing and skips `validate` (cannot validate without reading).
+ */
+export type ResponseType = 'json' | 'text' | 'arraybuffer' | 'blob' | 'stream';
 
 // ---- Validator extension point --------------------------------------------
 
@@ -88,6 +98,22 @@ export type Validator<T> =
   | ((input: unknown) => T)
   | { parse(input: unknown): T }
   | StandardSchemaV1<unknown, T>;
+
+/**
+ * Extracts the output type produced by any {@link Validator}. Used by the
+ * `Client` method overloads so that `http.get('/u', { validate: zodSchema })`
+ * narrows `data` to the validator's parsed type without explicit `<T>`.
+ *
+ * Standard Schema is checked **first** because Zod 3.24+ schemas implement
+ * both `~standard` and `parse()` — picking the structural branch ensures we
+ * read the canonical output type from `types.output` rather than the
+ * unparameterized `parse()` return.
+ */
+export type ValidatorOutput<V> =
+  V extends StandardSchemaV1<unknown, infer Out> ? Out :
+  V extends { parse(input: unknown): infer Out } ? Out :
+  V extends (input: unknown) => infer Out ? Out :
+  unknown;
 
 // ---- Request config -------------------------------------------------------
 
@@ -151,6 +177,28 @@ export interface InterceptorManager<T> {
 
 // ---- Client interface -----------------------------------------------------
 
+/**
+ * Parcely client.
+ *
+ * Each request method has two overloads:
+ *
+ * 1. **Validating overload** — when `config.validate` is provided, the
+ *    response `data` type is **inferred from the validator's output**. No
+ *    explicit `<T>` needed.
+ *
+ *    ```ts
+ *    const { data } = await http.get('/u', { validate: UserSchema })
+ *    //          ^? z.infer<typeof UserSchema>
+ *    ```
+ *
+ * 2. **Generic overload** — without `validate`, the caller annotates `<T>`.
+ *    ```ts
+ *    const { data } = await http.get<User>('/u')
+ *    //          ^? User
+ *    ```
+ *
+ * The validating overload is listed first so TS prefers it when both apply.
+ */
 export interface Client {
   defaults: RequestConfig;
 
@@ -159,14 +207,53 @@ export interface Client {
     response: InterceptorManager<HttpResponse<unknown>>;
   };
 
+  request<V extends Validator<unknown>>(
+    config: RequestConfig & { validate: V },
+  ): Promise<HttpResponse<ValidatorOutput<V>>>;
   request<T>(config: RequestConfig): Promise<HttpResponse<T>>;
 
+  get<V extends Validator<unknown>>(
+    url: string,
+    config: RequestConfig & { validate: V },
+  ): Promise<HttpResponse<ValidatorOutput<V>>>;
   get<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>;
+
+  delete<V extends Validator<unknown>>(
+    url: string,
+    config: RequestConfig & { validate: V },
+  ): Promise<HttpResponse<ValidatorOutput<V>>>;
   delete<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>;
+
+  head<V extends Validator<unknown>>(
+    url: string,
+    config: RequestConfig & { validate: V },
+  ): Promise<HttpResponse<ValidatorOutput<V>>>;
   head<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>;
+
+  options<V extends Validator<unknown>>(
+    url: string,
+    config: RequestConfig & { validate: V },
+  ): Promise<HttpResponse<ValidatorOutput<V>>>;
   options<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>;
 
+  post<V extends Validator<unknown>, B = unknown>(
+    url: string,
+    body: B | undefined,
+    config: RequestConfig & { validate: V },
+  ): Promise<HttpResponse<ValidatorOutput<V>>>;
   post<T, B = unknown>(url: string, body?: B, config?: RequestConfig): Promise<HttpResponse<T>>;
+
+  put<V extends Validator<unknown>, B = unknown>(
+    url: string,
+    body: B | undefined,
+    config: RequestConfig & { validate: V },
+  ): Promise<HttpResponse<ValidatorOutput<V>>>;
   put<T, B = unknown>(url: string, body?: B, config?: RequestConfig): Promise<HttpResponse<T>>;
+
+  patch<V extends Validator<unknown>, B = unknown>(
+    url: string,
+    body: B | undefined,
+    config: RequestConfig & { validate: V },
+  ): Promise<HttpResponse<ValidatorOutput<V>>>;
   patch<T, B = unknown>(url: string, body?: B, config?: RequestConfig): Promise<HttpResponse<T>>;
 }

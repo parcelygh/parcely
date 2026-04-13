@@ -72,6 +72,26 @@ namespace StandardSchemaV1 {
 }
 ```
 
+## ValidatorOutput\<V\>
+
+Conditional helper type that extracts the parsed-output type from any validator shape. The `Client` method overloads use this internally so calls like `http.get('/u', { validate: schema })` infer `data` from the schema with no explicit `<T>`. You can also use it directly when wrapping parcely:
+
+```ts
+import type { ValidatorOutput, Validator } from 'parcely'
+
+type FromZod   = ValidatorOutput<typeof UserSchema>          // z.infer<typeof UserSchema>
+type FromParse = ValidatorOutput<{ parse(i: unknown): User }> // User
+type FromFn    = ValidatorOutput<(i: unknown) => User>        // User
+type Fallback  = ValidatorOutput<unknown>                     // unknown
+```
+
+Resolution order (Standard Schema first because Zod 3.24+ implements both):
+
+1. `StandardSchemaV1<unknown, infer Out>` → `Out`
+2. `{ parse(input: unknown): infer Out }` → `Out`
+3. `(input: unknown) => infer Out` → `Out`
+4. otherwise → `unknown`
+
 ## Error behaviour
 
 When validation fails, parcely throws `HttpError` with:
