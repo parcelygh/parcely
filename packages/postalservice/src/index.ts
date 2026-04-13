@@ -2,6 +2,13 @@
 // postalservice — public barrel
 // ---------------------------------------------------------------------------
 
+// Client factory
+export { createClient } from './client.js';
+
+// Errors (value + type re-exports)
+export { HttpError, isHttpError } from './errors.js';
+export type { HttpErrorCode, HttpErrorOptions } from './errors.js';
+
 // Types (re-exported as type-only)
 export type {
   HeadersInit,
@@ -17,7 +24,3 @@ export type {
   InterceptorManager,
   Client,
 } from './types.js';
-
-// Errors (value + type re-exports)
-export { HttpError, isHttpError } from './errors.js';
-export type { HttpErrorCode, HttpErrorOptions } from './errors.js';
