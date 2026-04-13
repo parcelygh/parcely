@@ -1,6 +1,17 @@
 {
   "name": "@postalservice/auth-redirect",
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Browser-side login-redirect interceptor for postalservice. Redirects on 401/403 with optional return_to preservation and cooldown debounce.",
+  "license": "MIT",
+  "keywords": [
+    "postalservice",
+    "auth",
+    "redirect",
+    "login",
+    "interceptor",
+    "http",
+    "browser"
+  ],
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.js",
@@ -10,6 +21,14 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
