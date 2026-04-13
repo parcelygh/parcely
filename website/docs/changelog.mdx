@@ -1,0 +1,23 @@
+---
+sidebar_position: 100
+title: Changelog
+---
+
+# Changelog
+
+## v1.0.0
+
+Initial release.
+
+- Core HTTP client with `createClient`, method helpers (`get`, `post`, `put`, `patch`, `delete`, `head`, `options`), and `request`.
+- Request and response interceptors with `use` / `eject`.
+- `HttpError` with 11 descriptive error codes and `isHttpError` type guard.
+- `HttpResponse<T>` envelope with `data`, `status`, `statusText`, `headers`, and redacted `config`.
+- `RequestConfig` with full URL, header, body, timeout, cancellation, redirect, security, progress, and TLS options.
+- Runtime response validation via `validate` option (Standard Schema v1, `.parse()`, or plain function).
+- Upload and download progress tracking via `onUploadProgress` and `onDownloadProgress`.
+- Auto-FormData conversion from plain objects containing File/Blob values.
+- 13 security defaults: SSRF protection, redirect header stripping, prototype-pollution-safe merging, CRLF injection defense, content-type-aware parsing, and more.
+- Node.js TLS overrides via `tls` config (self-signed certs, custom CAs).
+- `@postalservice/auth-token` addon for token attachment and 401 refresh with single-flight coalescing.
+- `@postalservice/auth-redirect` addon for browser login redirects on 401/403.

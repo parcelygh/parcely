@@ -1,0 +1,57 @@
+---
+sidebar_position: 26
+title: Validation with ArkType
+---
+
+# Runtime validation with ArkType
+
+## Use case
+
+Validate API responses at runtime using ArkType, a TypeScript-native validator.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+import { type } from 'arktype'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const User = type({
+  id: 'string',
+  name: 'string',
+  email: 'string',
+})
+
+const { data } = await http.get('/users/me', {
+  validate: User,
+})
+```
+
+## How it works
+
+ArkType 2+ implements Standard Schema v1, so it works with postalservice's `validate` option out of the box.
+
+## Error handling
+
+```ts
+import { isHttpError } from 'postalservice'
+
+try {
+  await http.get('/users/me', { validate: User })
+} catch (err) {
+  if (isHttpError(err) && err.code === 'ERR_VALIDATION') {
+    console.log('Validation failed:', err.cause)
+  }
+}
+```
+
+## Axios equivalent
+
+Axios has no built-in validation support.
+
+## Notes and gotchas
+
+- ArkType is a dependency of your app, not of postalservice.
+- ArkType 2+ is required for Standard Schema v1 support.
+- The `Validator<T>` type supports Standard Schema v1, `.parse()` objects, and plain functions.

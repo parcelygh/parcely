@@ -1,0 +1,68 @@
+---
+sidebar_position: 7
+title: Auth redirect (browser)
+---
+
+# Redirect to login on 401/403 in the browser
+
+## Use case
+
+In a browser app, redirect the user to a login page when the API returns 401 or 403.
+
+## Using `@postalservice/auth-redirect`
+
+```ts
+import { createClient } from 'postalservice'
+import { createAuthRedirect } from '@postalservice/auth-redirect'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const redirect = createAuthRedirect({
+  loginUrl: '/login',
+  on: [401, 403],
+  preserveReturnTo: true,
+  returnToParam: 'return_to',
+})
+
+redirect.install(http)
+```
+
+When the client receives a 401 or 403, the browser navigates to `/login?return_to=%2Fcurrent-path`.
+
+## Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `loginUrl` | `string \| ((err) => string)` | (required) | URL to redirect to. Can be a function for dynamic URLs. |
+| `on` | `number[]` | `[401, 403]` | Status codes that trigger a redirect. |
+| `preserveReturnTo` | `boolean` | `true` | Append the current path as a query parameter. |
+| `returnToParam` | `string` | `'return_to'` | Name of the return-to query parameter. |
+| `shouldRedirect` | `(err) => boolean` | `undefined` | Optional predicate to skip redirect for certain requests. |
+| `cooldownMs` | `number` | `2000` | Debounce period to prevent redirect storms. |
+
+## Conditional redirect
+
+Skip the redirect for certain routes:
+
+```ts
+const redirect = createAuthRedirect({
+  loginUrl: '/login',
+  on: [401],
+  shouldRedirect: (err) => !err.config.url?.includes('/public/'),
+})
+```
+
+## Combining with `@postalservice/auth-token`
+
+If you install both addons, install auth-token **first**. The redirect will only fire after the token refresh has failed:
+
+```ts
+auth.install(http)       // first: tries to refresh
+redirect.install(http)   // second: redirects if refresh failed
+```
+
+## Notes and gotchas
+
+- **Browser-only.** In non-browser runtimes (Node, Bun, Deno), the interceptor is a no-op and emits a one-shot `console.warn`.
+- The `cooldownMs` option prevents multiple rapid 401s from triggering multiple redirects.
+- The redirect uses `window.location.href` assignment, not `history.pushState`.

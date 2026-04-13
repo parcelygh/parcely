@@ -1,0 +1,90 @@
+---
+sidebar_position: 9
+title: Cancellation
+---
+
+# Cancellation with AbortController
+
+## Use case
+
+Cancel in-flight requests -- for example, when a user navigates away or types a new search query.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const controller = new AbortController()
+
+// Start the request
+const promise = http.get('/search', {
+  params: { q: 'hello' },
+  signal: controller.signal,
+})
+
+// Cancel it
+controller.abort()
+```
+
+When aborted, the request throws `HttpError` with `code: 'ERR_ABORTED'`.
+
+## Handling cancellation
+
+```ts
+import { isHttpError } from 'postalservice'
+
+try {
+  await http.get('/data', { signal: controller.signal })
+} catch (err) {
+  if (isHttpError(err) && err.code === 'ERR_ABORTED') {
+    console.log('Request was cancelled')
+  }
+}
+```
+
+## React example: cancel on unmount
+
+```tsx
+import { useEffect, useState } from 'react'
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+function UserProfile({ userId }: { userId: string }) {
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    const controller = new AbortController()
+    http.get(`/users/${userId}`, { signal: controller.signal })
+      .then((res) => setUser(res.data))
+      .catch(() => {})
+    return () => controller.abort()
+  }, [userId])
+
+  return user ? <div>{user.name}</div> : <div>Loading...</div>
+}
+```
+
+## Axios equivalent
+
+```ts
+// axios (modern):
+const controller = new AbortController()
+await http.get('/data', { signal: controller.signal })
+controller.abort()
+
+// postalservice (identical):
+const controller2 = new AbortController()
+await http.get('/data', { signal: controller2.signal })
+controller2.abort()
+```
+
+postalservice does not support the legacy axios `CancelToken` API. Use `AbortController` instead.
+
+## Notes and gotchas
+
+- The `signal` option accepts any `AbortSignal`.
+- If both `signal` and `timeout` are set, they are combined via `AbortSignal.any`. A user abort produces `ERR_ABORTED`; a timeout produces `ERR_TIMEOUT`.
+- After abort, the response body is consumed/discarded to prevent resource leaks.

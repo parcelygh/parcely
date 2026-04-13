@@ -1,0 +1,43 @@
+---
+sidebar_position: 14
+title: Uploads (Node ReadStream)
+---
+
+# File uploads with Node fs.ReadStream
+
+## Use case
+
+Upload a large file from disk in Node.js using a readable stream, without loading the entire file into memory.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+import { createReadStream } from 'node:fs'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+await http.post('/upload', createReadStream('./big.zip'), {
+  headers: { 'Content-Type': 'application/zip' },
+})
+```
+
+## Axios equivalent
+
+```ts
+// axios (Node):
+import { createReadStream } from 'node:fs'
+
+await http.post('/upload', createReadStream('./big.zip'), {
+  headers: { 'Content-Type': 'application/zip' },
+})
+```
+
+The pattern is identical. Under the hood, postalservice converts the Node `ReadStream` to a Web `ReadableStream` for use with `fetch`.
+
+## Notes and gotchas
+
+- You **must** set `Content-Type` manually when using a stream. postalservice cannot infer it from a `ReadStream`.
+- The Node `ReadStream` is converted to a Web `ReadableStream` under the hood. This is transparent to the caller.
+- Stream errors during upload produce `HttpError` with `code: 'ERR_NETWORK'`.
+- Node file-path convenience helpers (e.g., `uploadFile('./big.zip')`, chunked/resumable uploads) are out of scope for v1 core and reserved for a future `@postalservice/upload-node` subpackage.

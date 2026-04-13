@@ -1,0 +1,88 @@
+---
+sidebar_position: 6
+title: Auth refresh on 401
+---
+
+# Automatic token refresh on 401
+
+## Use case
+
+When an API returns 401, automatically refresh the access token and retry the original request.
+
+## Using `@postalservice/auth-token` (recommended)
+
+```ts
+import { createClient } from 'postalservice'
+import { createAuthToken } from '@postalservice/auth-token'
+
+const refreshClient = createClient({ baseURL: 'https://api.example.com' })
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const auth = createAuthToken({
+  scheme: 'Bearer',
+  getToken: async () => localStorage.getItem('access_token'),
+  refreshOn: [401],
+  refresh: async () => {
+    const r = await refreshClient.post('/auth/refresh')
+    localStorage.setItem('access_token', r.data.access)
+    return r.data.access
+  },
+})
+
+auth.install(http)
+```
+
+Key behaviour:
+- **Single-flight refresh:** concurrent 401s share the same refresh promise. Only one refresh request is made.
+- **Retry once:** after refresh, the original failed request is retried with the new token.
+- **Bounded retry:** if the retried request also 401s, it is not retried again (prevents infinite loops).
+- **Refresh failure:** if the refresh call itself fails, the original error propagates.
+
+## Hand-rolled interceptor recipe
+
+```ts
+import { createClient, isHttpError } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+let refreshPromise: Promise<string> | null = null
+
+http.interceptors.request.use((config) => ({
+  ...config,
+  headers: {
+    ...config.headers,
+    Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+  },
+}))
+
+http.interceptors.response.use(undefined, async (err) => {
+  if (!isHttpError(err) || err.status !== 401) throw err
+
+  if (!refreshPromise) {
+    refreshPromise = http
+      .post('/auth/refresh')
+      .then((r) => {
+        localStorage.setItem('access_token', r.data.access)
+        return r.data.access as string
+      })
+      .finally(() => { refreshPromise = null })
+  }
+
+  const newToken = await refreshPromise
+  const retryConfig = {
+    ...err.config,
+    headers: { ...err.config.headers, Authorization: `Bearer ${newToken}` },
+  }
+  return http.request(retryConfig)
+})
+```
+
+## Axios equivalent
+
+The axios pattern is essentially the same interceptor approach. `@postalservice/auth-token` removes the boilerplate.
+
+## Notes and gotchas
+
+- Use a **separate client** for the refresh call to avoid interceptor loops.
+- The `@postalservice/auth-token` addon handles single-flight coalescing and retry bounding automatically.
+- If you install both `@postalservice/auth-token` and `@postalservice/auth-redirect`, install auth-token first. The redirect runs after refresh has failed.

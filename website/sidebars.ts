@@ -1,21 +1,90 @@
 import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
 
-/**
- * Sidebar skeleton matching the postalservice content plan.
- *
- * Only the intro page exists at this point.  Phase B docs vertical will
- * populate the remaining categories and leaf pages.
- */
 const sidebars: SidebarsConfig = {
   docsSidebar: [
     'intro',
-    // The following categories will be populated by the docs vertical:
-    // - migrating-from-axios
-    // - guides (how-tos)
-    // - security
-    // - cookbook
-    // - reference (API docs)
-    // - roadmap
+    'installation',
+    'quick-start',
+    'migrating-from-axios',
+    {
+      type: 'category',
+      label: 'Guides',
+      items: [
+        'guides/baseurl-and-defaults',
+        'guides/body-json-formdata-urlencoded-binary',
+        'guides/response-json-text-blob-arraybuffer',
+        'guides/query-parameters',
+        'guides/auth-bearer-basic-custom',
+        'guides/auth-refresh-on-401',
+        'guides/auth-redirect-browser',
+        'guides/timeouts',
+        'guides/cancellation',
+        'guides/combining-signal-and-timeout',
+        'guides/retries-with-backoff',
+        'guides/uploads-formdata',
+        'guides/uploads-binary-body',
+        'guides/uploads-node-readstream',
+        'guides/upload-progress',
+        'guides/download-progress',
+        'guides/download-streaming',
+        'guides/nodejs-usage',
+        'guides/browser-usage',
+        'guides/bun-deno-usage',
+        'guides/react-usage',
+        'guides/tls-self-signed',
+        'guides/tls-custom-ca',
+        'guides/validation-zod',
+        'guides/validation-valibot',
+        'guides/validation-arktype',
+        'guides/validation-function',
+        'guides/testing-with-stubbed-fetch',
+        'guides/logging-and-redaction',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Security',
+      items: [
+        'security/threat-model',
+        'security/ssrf-defenses',
+        'security/redirect-header-stripping',
+        'security/prototype-pollution-safe-merging',
+        'security/crlf-header-injection',
+        'security/content-type-aware-parsing',
+        'security/timeout-abort-cleanup',
+        'security/axios-cve-index',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Cookbook',
+      items: [
+        'cookbook/service-object-wrapper',
+        'cookbook/request-deduping',
+        'cookbook/response-caching',
+        'cookbook/graphql-helper',
+        'cookbook/rate-limiting',
+        'cookbook/logging-middleware',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Reference',
+      items: [
+        'reference/create-client',
+        'reference/client',
+        'reference/request-config',
+        'reference/http-response',
+        'reference/http-error',
+        'reference/interceptor-handler',
+        'reference/tls-config',
+        'reference/validator',
+        'reference/auth-token',
+        'reference/auth-redirect',
+      ],
+    },
+    'changelog',
+    'roadmap',
   ],
 };
 

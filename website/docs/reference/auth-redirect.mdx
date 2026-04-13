@@ -1,0 +1,83 @@
+---
+sidebar_position: 10
+title: "@postalservice/auth-redirect"
+---
+
+# @postalservice/auth-redirect
+
+Redirect the browser to a login URL on 401/403.
+
+```ts
+import { createAuthRedirect } from '@postalservice/auth-redirect'
+```
+
+## createAuthRedirect(options)
+
+Creates a redirect handler that can be installed on a client.
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `loginUrl` | `string \| ((err: HttpError) => string)` | (required) | The URL to redirect to. Can be a function for dynamic URLs. |
+| `on` | `number[]` | `[401, 403]` | HTTP status codes that trigger a redirect. |
+| `preserveReturnTo` | `boolean` | `true` | Whether to append the current path as a query parameter. |
+| `returnToParam` | `string` | `'return_to'` | The name of the return-to query parameter. |
+| `shouldRedirect` | `(err: HttpError) => boolean` | `undefined` | Optional predicate. Return `false` to skip the redirect for certain requests. |
+| `cooldownMs` | `number` | `2000` | Debounce period in milliseconds to prevent redirect storms from multiple concurrent 401s. |
+
+### Return value
+
+```ts
+{
+  response: InterceptorHandler<HttpResponse<unknown>>
+  install(client: Client): void
+}
+```
+
+| Property | Description |
+|---|---|
+| `response` | A response interceptor handler that triggers the redirect. |
+| `install(client)` | Convenience method that wires the response interceptor onto the client. |
+
+## Browser-only
+
+This addon uses `window.location.href` to redirect. In non-browser environments (Node, Bun, Deno), the interceptor is a no-op and emits a one-shot `console.warn`.
+
+## Example
+
+```ts
+import { createClient } from 'postalservice'
+import { createAuthRedirect } from '@postalservice/auth-redirect'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const redirect = createAuthRedirect({
+  loginUrl: '/login',
+  on: [401, 403],
+  preserveReturnTo: true,
+  returnToParam: 'return_to',
+  shouldRedirect: (err) => !err.config.url?.includes('/public/'),
+  cooldownMs: 2000,
+})
+
+redirect.install(http)
+```
+
+## Combining with @postalservice/auth-token
+
+Install auth-token **first**, then auth-redirect. The redirect fires only after the token refresh has failed:
+
+```ts
+import { createAuthToken } from '@postalservice/auth-token'
+import { createAuthRedirect } from '@postalservice/auth-redirect'
+
+auth.install(http)       // first: tries to refresh the token
+redirect.install(http)   // second: redirects if refresh failed
+```
+
+## See also
+
+- [Auth redirect (browser)](/docs/guides/auth-redirect-browser)
+- [Auth refresh on 401](/docs/guides/auth-refresh-on-401)
+- [`InterceptorHandler`](/docs/reference/interceptor-handler)

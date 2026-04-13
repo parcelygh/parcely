@@ -1,0 +1,67 @@
+---
+sidebar_position: 2
+---
+
+# Installation
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Core package
+
+<Tabs>
+<TabItem value="npm" label="npm">
+
+```bash
+npm install postalservice
+```
+
+</TabItem>
+<TabItem value="pnpm" label="pnpm">
+
+```bash
+pnpm add postalservice
+```
+
+</TabItem>
+<TabItem value="yarn" label="yarn">
+
+```bash
+yarn add postalservice
+```
+
+</TabItem>
+<TabItem value="bun" label="bun">
+
+```bash
+bun add postalservice
+```
+
+</TabItem>
+</Tabs>
+
+## Optional addons
+
+### `@postalservice/auth-token`
+
+Attach tokens to requests and optionally refresh on 401.
+
+```bash
+npm install @postalservice/auth-token
+```
+
+### `@postalservice/auth-redirect`
+
+Redirect the browser to a login URL on 401/403.
+
+```bash
+npm install @postalservice/auth-redirect
+```
+
+## Requirements
+
+- **Node.js** 20+ (uses global `fetch` and built-in `undici` for TLS overrides)
+- **Browsers**: any environment with global `fetch` (all modern browsers)
+- **Bun** and **Deno** work out of the box
+
+postalservice has **zero runtime dependencies**. TypeScript types are bundled in the package.

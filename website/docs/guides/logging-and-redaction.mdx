@@ -1,0 +1,76 @@
+---
+sidebar_position: 29
+title: Logging and redaction
+---
+
+# Logging and redaction
+
+## Use case
+
+Log request and response details for debugging, with sensitive headers automatically redacted.
+
+## Request/response logging interceptor
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+http.interceptors.request.use((config) => {
+  console.log(`--> ${config.method ?? 'GET'} ${config.url}`)
+  return config
+})
+
+http.interceptors.response.use(
+  (response) => {
+    console.log(`<-- ${response.status} ${response.config.url}`)
+    return response
+  },
+  (err) => {
+    console.error(`<-- ERROR ${err}`)
+    throw err
+  },
+)
+```
+
+## Automatic redaction
+
+postalservice automatically redacts sensitive header values in:
+
+- The `config` field of `HttpResponse` envelopes
+- The `config` field of `HttpError` objects
+
+By default, the following headers are redacted (values replaced with `'[REDACTED]'`):
+
+- `authorization`
+- `cookie`
+- `proxy-authorization`
+- `set-cookie`
+- `x-api-key`
+
+## Custom sensitive headers
+
+```ts
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  sensitiveHeaders: [
+    'authorization',
+    'cookie',
+    'proxy-authorization',
+    'set-cookie',
+    'x-api-key',
+    'x-secret-token',  // add your own
+  ],
+})
+```
+
+## Axios equivalent
+
+Axios does not redact sensitive headers in errors or responses. In postalservice, redaction is built in.
+
+## Notes and gotchas
+
+- Redaction applies to the `config` attached to responses and errors. It does **not** affect the actual headers sent in the request.
+- Request interceptors see the live, un-redacted config. This is intentional -- interceptors need full access to set headers.
+- The `sensitiveHeaders` option is case-insensitive.
+- Setting `sensitiveHeaders` replaces the default list entirely. Include the defaults if you want to extend rather than replace.

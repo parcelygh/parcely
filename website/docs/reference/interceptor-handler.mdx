@@ -1,0 +1,80 @@
+---
+sidebar_position: 6
+title: InterceptorHandler
+---
+
+# InterceptorHandler\<T\>
+
+The shape of an interceptor handler registered with `interceptors.request.use()` or `interceptors.response.use()`.
+
+## Types
+
+```ts
+interface InterceptorHandler<T> {
+  fulfilled?: (value: T) => T | Promise<T>
+  rejected?: (err: unknown) => unknown
+}
+
+interface InterceptorManager<T> {
+  use(handler: InterceptorHandler<T>): number
+  use(
+    onFulfilled?: (value: T) => T | Promise<T>,
+    onRejected?: (err: unknown) => unknown,
+  ): number
+  eject(id: number): void
+}
+```
+
+## InterceptorHandler fields
+
+| Field | Type | Description |
+|---|---|---|
+| `fulfilled` | `(value: T) => T \| Promise<T>` | Called on the success path. For request interceptors, `T` is `RequestConfig`. For response interceptors, `T` is `HttpResponse<unknown>`. |
+| `rejected` | `(err: unknown) => unknown` | Called on the error path. Throw to propagate the error, or return a value to recover. |
+
+## InterceptorManager methods
+
+| Method | Description |
+|---|---|
+| `use(handler)` | Register an interceptor. Returns an ID for later removal. |
+| `use(onFulfilled?, onRejected?)` | Register with separate callbacks (axios-compatible overload). |
+| `eject(id)` | Remove a previously registered interceptor by ID. |
+
+## Example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+// Object form
+const id = http.interceptors.request.use({
+  fulfilled: (config) => ({
+    ...config,
+    headers: { ...config.headers, 'X-Trace': crypto.randomUUID() },
+  }),
+  rejected: (err) => { throw err },
+})
+
+// Callback form (axios-compatible)
+http.interceptors.response.use(
+  (response) => response,
+  (err) => { console.error(err); throw err },
+)
+
+// Remove an interceptor
+http.interceptors.request.eject(id)
+```
+
+## Execution order
+
+1. Request interceptors run in registration order.
+2. The HTTP request is made.
+3. Response interceptors run in registration order.
+4. If any interceptor throws, subsequent interceptors on the success path are skipped, but error-path handlers run.
+
+## See also
+
+- [`Client`](/docs/reference/client)
+- [`RequestConfig`](/docs/reference/request-config)
+- [`HttpResponse`](/docs/reference/http-response)

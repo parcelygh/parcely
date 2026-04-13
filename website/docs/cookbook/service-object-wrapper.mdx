@@ -1,0 +1,70 @@
+---
+sidebar_position: 1
+title: Service object wrapper
+---
+
+# Service object wrapper pattern
+
+## Use case
+
+Encapsulate API calls in a typed service object for better organisation and reusability.
+
+## Example
+
+```ts
+import { createClient } from 'postalservice'
+import type { HttpResponse } from 'postalservice'
+
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
+interface CreateUserInput {
+  name: string
+  email: string
+}
+
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  headers: { Accept: 'application/json' },
+  timeout: 5000,
+})
+
+const userService = {
+  async list(): Promise<User[]> {
+    const { data } = await http.get<User[]>('/users')
+    return data
+  },
+
+  async getById(id: string): Promise<User> {
+    const { data } = await http.get<User>(`/users/${id}`)
+    return data
+  },
+
+  async create(input: CreateUserInput): Promise<User> {
+    const { data } = await http.post<User, CreateUserInput>('/users', input)
+    return data
+  },
+
+  async update(id: string, input: Partial<CreateUserInput>): Promise<User> {
+    const { data } = await http.patch<User, Partial<CreateUserInput>>(`/users/${id}`, input)
+    return data
+  },
+
+  async remove(id: string): Promise<void> {
+    await http.delete(`/users/${id}`)
+  },
+}
+
+// Usage:
+const users = await userService.list()
+const newUser = await userService.create({ name: 'Mickey', email: 'm@example.com' })
+```
+
+## Notes
+
+- Type parameters on `.get<T>()`, `.post<T, B>()`, etc. provide type inference for both requests and responses.
+- Combine with runtime validation (`validate`) for additional safety.
+- The service object pattern works well with dependency injection frameworks.

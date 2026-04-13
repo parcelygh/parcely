@@ -1,0 +1,100 @@
+---
+sidebar_position: 2
+title: Client
+---
+
+# Client
+
+The `Client` interface is returned by [`createClient`](/docs/reference/create-client). It provides HTTP method helpers, interceptors, and access to default configuration.
+
+```ts
+interface Client {
+  defaults: RequestConfig
+
+  interceptors: {
+    request: InterceptorManager<RequestConfig>
+    response: InterceptorManager<HttpResponse<unknown>>
+  }
+
+  request<T>(config: RequestConfig): Promise<HttpResponse<T>>
+
+  get<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>
+  delete<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>
+  head<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>
+  options<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>
+
+  post<T, B = unknown>(url: string, body?: B, config?: RequestConfig): Promise<HttpResponse<T>>
+  put<T, B = unknown>(url: string, body?: B, config?: RequestConfig): Promise<HttpResponse<T>>
+  patch<T, B = unknown>(url: string, body?: B, config?: RequestConfig): Promise<HttpResponse<T>>
+}
+```
+
+## Properties
+
+| Property | Type | Description |
+|---|---|---|
+| `defaults` | `RequestConfig` | The default configuration. Mutable -- changes affect subsequent requests. |
+| `interceptors.request` | `InterceptorManager<RequestConfig>` | Request interceptor manager. |
+| `interceptors.response` | `InterceptorManager<HttpResponse<unknown>>` | Response interceptor manager. |
+
+## Methods
+
+### `request<T>(config)`
+
+Make a request with the given config. The `method` and `url` must be specified in the config.
+
+### `get<T>(url, config?)`
+
+Make a GET request. Type parameter `T` is the expected response data type.
+
+### `post<T, B>(url, body?, config?)`
+
+Make a POST request. `T` is the response type, `B` is the body type. The body is passed as the second argument.
+
+### `put<T, B>(url, body?, config?)`
+
+Make a PUT request. Same signature as `post`.
+
+### `patch<T, B>(url, body?, config?)`
+
+Make a PATCH request. Same signature as `post`.
+
+### `delete<T>(url, config?)`
+
+Make a DELETE request.
+
+### `head<T>(url, config?)`
+
+Make a HEAD request.
+
+### `options<T>(url, config?)`
+
+Make an OPTIONS request.
+
+## Example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+// GET
+const { data } = await http.get<{ name: string }>('/users/me')
+
+// POST with typed body
+await http.post<{ id: string }, { name: string }>('/users', { name: 'Mickey' })
+
+// Interceptors
+const id = http.interceptors.request.use((config) => ({
+  ...config,
+  headers: { ...config.headers, 'X-Trace': crypto.randomUUID() },
+}))
+
+http.interceptors.request.eject(id)
+```
+
+## See also
+
+- [`RequestConfig`](/docs/reference/request-config)
+- [`HttpResponse`](/docs/reference/http-response)
+- [`InterceptorHandler`](/docs/reference/interceptor-handler)

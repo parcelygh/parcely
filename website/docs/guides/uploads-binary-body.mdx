@@ -1,0 +1,63 @@
+---
+sidebar_position: 13
+title: Uploads (binary body)
+---
+
+# Single binary body upload
+
+## Use case
+
+Upload a raw file (Blob, File, or ArrayBuffer) as the entire request body, without multipart encoding.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+// Blob
+const blob = new Blob([arrayBuffer], { type: 'application/zip' })
+await http.post('/upload', blob)
+// Content-Type is inferred from blob.type
+
+// File (inherits from Blob)
+await http.post('/upload', file)
+
+// ArrayBuffer
+await http.post('/upload', arrayBuffer, {
+  headers: { 'Content-Type': 'application/octet-stream' },
+})
+```
+
+## ReadableStream
+
+You can also pass a `ReadableStream` directly:
+
+```ts
+const stream = someReadableStream
+await http.post('/upload', stream, {
+  headers: { 'Content-Type': 'application/octet-stream' },
+})
+```
+
+## Axios equivalent
+
+In axios, you would pass the binary data as the `data` argument:
+
+```ts
+// axios:
+await http.post('/upload', blob, {
+  headers: { 'Content-Type': 'application/zip' },
+})
+
+// postalservice (identical for Blob/File):
+await http.post('/upload', blob)
+// Content-Type is inferred from blob.type
+```
+
+## Notes and gotchas
+
+- `Blob`, `File`, `ArrayBuffer`, `ReadableStream`, and `string` bodies are passed through to `fetch` without modification.
+- For `Blob` and `File`, `Content-Type` is inferred from the object's `type` property. For `ArrayBuffer` and `ReadableStream`, set `Content-Type` manually.
+- Auto-FormData does **not** trigger for these types -- only for plain objects with File/Blob values.

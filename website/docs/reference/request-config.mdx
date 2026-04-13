@@ -1,0 +1,125 @@
+---
+sidebar_position: 3
+title: RequestConfig
+---
+
+# RequestConfig
+
+The configuration object for HTTP requests. Passed as defaults to `createClient` or per-request to method helpers.
+
+```ts
+interface RequestConfig {
+  baseURL?: string | URL
+  url?: string
+  method?: string
+  headers?: HeadersInit
+  params?: Record<string, unknown>
+  body?: unknown
+  timeout?: number
+  signal?: AbortSignal
+  responseType?: ResponseType
+  validate?: Validator<unknown>
+  tls?: TlsConfig
+
+  followRedirects?: boolean
+  maxRedirects?: number
+  redirect?: 'follow' | 'manual' | 'error'
+
+  allowAbsoluteUrls?: boolean
+  allowedProtocols?: string[]
+  allowedRequestHeaders?: string[]
+  sensitiveHeaders?: string[]
+
+  formDataSerializer?: FormDataSerializer
+  onUploadProgress?: (event: ProgressEvent) => void
+  onDownloadProgress?: (event: ProgressEvent) => void
+}
+```
+
+## Options reference
+
+### URL and routing
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `baseURL` | `string \| URL` | `undefined` | Base URL prepended to relative `url` values. |
+| `url` | `string` | `undefined` | Request URL (relative to `baseURL` if set). |
+| `method` | `string` | `'GET'` | HTTP method (`'GET'`, `'POST'`, `'PUT'`, `'PATCH'`, `'DELETE'`, `'HEAD'`, `'OPTIONS'`). |
+| `params` | `Record<string, unknown>` | `undefined` | Query parameters appended to the URL. |
+
+### Headers and body
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `headers` | `HeadersInit` | `undefined` | Request headers. Accepts `Record<string, string>`, `[string, string][]`, or `Headers`. |
+| `body` | `unknown` | `undefined` | Request body. Plain objects are JSON-serialised. Objects with File/Blob values are auto-converted to FormData. |
+| `formDataSerializer` | `FormDataSerializer` | `'brackets'` | How arrays and nested objects are serialised in auto-FormData: `'brackets'`, `'indices'`, or `'repeat'`. |
+
+### Response
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `responseType` | `ResponseType` | `'json'` | How the response body is parsed: `'json'`, `'text'`, `'arraybuffer'`, or `'blob'`. |
+| `validate` | `Validator<unknown>` | `undefined` | Runtime response validator. Accepts Standard Schema v1, `{ parse(input): T }`, or `(input) => T`. |
+
+### Timing and cancellation
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `timeout` | `number` | `undefined` | Request timeout in milliseconds. `0` or `undefined` means no timeout. |
+| `signal` | `AbortSignal` | `undefined` | Abort signal for cancellation. Combined with timeout via `AbortSignal.any`. |
+
+### Redirects
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `followRedirects` | `boolean` | `true` | Whether to follow HTTP redirects. |
+| `maxRedirects` | `number` | `5` | Maximum number of redirects to follow. |
+| `redirect` | `'follow' \| 'manual' \| 'error'` | `'manual'` | Low-level fetch `redirect` option. `followRedirects` takes priority. Internal use. |
+
+### Security
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `allowAbsoluteUrls` | `boolean` | `false` (when `baseURL` set) | Whether to allow absolute URLs in the `url` field. |
+| `allowedProtocols` | `string[]` | `['http:', 'https:']` | Permitted URI schemes. |
+| `allowedRequestHeaders` | `string[]` | `undefined` | Opt-in allowlist of permitted request header names. When set, unlisted headers throw `ERR_DISALLOWED_HEADER`. |
+| `sensitiveHeaders` | `string[]` | `['authorization', 'cookie', 'proxy-authorization', 'set-cookie', 'x-api-key']` | Headers stripped on cross-origin redirects and redacted in error/response configs. |
+
+### TLS (Node-only)
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `tls` | `TlsConfig` | `undefined` | TLS configuration for Node.js. See [`TlsConfig`](/docs/reference/tls-config). |
+
+### Progress
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `onUploadProgress` | `(event: ProgressEvent) => void` | `undefined` | Upload progress callback. |
+| `onDownloadProgress` | `(event: ProgressEvent) => void` | `undefined` | Download progress callback. |
+
+### ProgressEvent shape
+
+```ts
+interface ProgressEvent {
+  loaded: number
+  total?: number
+  percent?: number
+}
+```
+
+## Type aliases
+
+```ts
+type HeadersInit = Record<string, string> | [string, string][] | Headers
+type ResponseType = 'json' | 'text' | 'arraybuffer' | 'blob'
+type FormDataSerializer = 'brackets' | 'indices' | 'repeat'
+```
+
+## See also
+
+- [`Client`](/docs/reference/client)
+- [`HttpResponse`](/docs/reference/http-response)
+- [`TlsConfig`](/docs/reference/tls-config)
+- [`Validator`](/docs/reference/validator)

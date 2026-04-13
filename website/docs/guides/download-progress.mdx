@@ -1,0 +1,60 @@
+---
+sidebar_position: 16
+title: Download progress
+---
+
+# Download progress tracking
+
+## Use case
+
+Show progress while downloading large responses.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const { data } = await http.get('/large-file', {
+  responseType: 'blob',
+  onDownloadProgress: ({ loaded, total, percent }) => {
+    console.log(`${loaded} / ${total} bytes (${percent}%)`)
+  },
+})
+```
+
+## Progress event shape
+
+```ts
+interface ProgressEvent {
+  loaded: number       // bytes received so far
+  total?: number       // total bytes from Content-Length (undefined if unknown)
+  percent?: number     // 0–100 (undefined if total is unknown)
+}
+```
+
+## Universal support
+
+Download progress is universally supported across all runtimes where `fetch` is available. It works by wrapping the response body `ReadableStream` before parsing.
+
+## Axios equivalent
+
+```ts
+// axios:
+await http.get('/file', {
+  onDownloadProgress: (e) => console.log(e.loaded),
+})
+
+// postalservice (adds percent):
+await http.get('/file', {
+  onDownloadProgress: ({ loaded, total, percent }) =>
+    console.log(loaded, total, percent),
+})
+```
+
+## Notes and gotchas
+
+- `total` comes from the response `Content-Length` header. It is `undefined` when the server uses chunked transfer encoding without a content length.
+- Download progress tracking works with all `responseType` values (`'json'`, `'text'`, `'arraybuffer'`, `'blob'`).
+- Stream errors during download produce `HttpError` with `code: 'ERR_NETWORK'`.

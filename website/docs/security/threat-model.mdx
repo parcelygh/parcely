@@ -1,0 +1,47 @@
+---
+sidebar_position: 1
+title: Threat model and defaults
+---
+
+# Threat model and security defaults
+
+postalservice is designed with 13 security defaults that are enabled out of the box. These defaults address every class of vulnerability found in axios CVEs over the past several years.
+
+## Security defaults table
+
+| # | Defense | Default | Description |
+|---|---|---|---|
+| 1 | Reject absolute URLs when `baseURL` is set | `allowAbsoluteUrls: false` | Prevents SSRF via base-URL override (CVE-2024-39338, CVE-2025-27152). URLs starting with `//`, `http:`, `https:`, etc. are rejected when a `baseURL` is configured. |
+| 2 | URI scheme allowlist | `allowedProtocols: ['http:', 'https:']` | Blocks `file:`, `data:`, `javascript:`, and other dangerous schemes before the request is made. |
+| 3 | Cross-origin redirect header stripping | Always on | When following redirects to a different origin, sensitive headers (`authorization`, `cookie`, `proxy-authorization`, `set-cookie`, `x-api-key`, and any user-defined `sensitiveHeaders`) are stripped. |
+| 4 | Manual redirect walk with `maxRedirects` | `maxRedirects: 5` | Redirects are followed manually (not by the browser/runtime), giving postalservice control over header stripping and redirect limits. |
+| 5 | Prototype-pollution-safe config merging | Always on | Config merging uses an explicit allowlist copy. `__proto__`, `constructor`, and `prototype` keys are stripped from nested objects (CVE-2024-57965). |
+| 6 | CRLF injection defense | Always on | Header names and values are validated via the native `Headers` API, which rejects `\r\n` sequences (ERR_CRLF_INJECTION). |
+| 7 | Optional request header allowlist | `allowedRequestHeaders: undefined` (opt-in) | When set, only listed header names are permitted. Unlisted headers throw `ERR_DISALLOWED_HEADER`. |
+| 8 | Content-type-aware JSON parsing | Always on | The response `Content-Type` is checked before JSON parsing. Non-JSON content types return raw text instead of crashing with `SyntaxError`. |
+| 9 | Timeout + signal combined via `AbortSignal.any` | Always on | Timers are always cleaned up in `finally`. No leaked timers, no leaked streams. |
+| 10 | Raw `Response` never exposed | Always on | Only the structured `HttpResponse` envelope is returned. The raw fetch `Response` is consumed internally. |
+| 11 | TLS warning for `rejectUnauthorized: false` | Always on (Node) | A one-shot `console.warn` fires when TLS certificate validation is disabled. |
+| 12 | Sensitive header redaction | Always on | Header values for sensitive headers are replaced with `'[REDACTED]'` in `HttpResponse.config` and `HttpError.config`. |
+| 13 | Opt-in runtime body validation | Opt-in via `validate` | When a `Validator<T>` is provided, the response body is validated after parsing. Failures produce `ERR_VALIDATION`. |
+
+## Opting out
+
+Each defense can be relaxed if needed:
+
+- **Absolute URLs**: set `allowAbsoluteUrls: true`
+- **Protocol allowlist**: extend `allowedProtocols`
+- **Redirect limit**: increase `maxRedirects` or set `followRedirects: false`
+- **Sensitive headers**: customise the `sensitiveHeaders` array
+- **Header allowlist**: omit `allowedRequestHeaders` (default)
+
+## Non-goals for v1
+
+The following are intentionally out of scope for v1:
+
+- mTLS / client certificates
+- Minimum TLS version override
+- Host allowlists / blocklists
+- Request/response size limits
+- HSTS enforcement
+- Automatic retries (planned: `@postalservice/retry`)

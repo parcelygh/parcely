@@ -1,0 +1,72 @@
+---
+sidebar_position: 20
+title: Bun and Deno usage
+---
+
+# Bun and Deno usage
+
+## Use case
+
+Use postalservice in Bun or Deno applications.
+
+## Bun
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  timeout: 5000,
+})
+
+const { data } = await http.get('/users')
+console.log(data)
+```
+
+No special configuration needed. Bun provides `globalThis.fetch` natively.
+
+Install with:
+
+```bash
+bun add postalservice
+```
+
+## Deno
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  timeout: 5000,
+})
+
+const { data } = await http.get('/users')
+console.log(data)
+```
+
+Deno supports npm specifiers:
+
+```ts
+import { createClient } from 'npm:postalservice'
+```
+
+Or add to `deno.json`:
+
+```json
+{
+  "imports": {
+    "postalservice": "npm:postalservice"
+  }
+}
+```
+
+## Axios equivalent
+
+The usage pattern is identical to axios in both runtimes. The only difference is the import.
+
+## Notes and gotchas
+
+- Both Bun and Deno provide `globalThis.fetch` and `AbortSignal.any` natively.
+- The `tls` option is Node-specific (it uses `undici` under the hood). In Bun and Deno, TLS configuration should be done via runtime-specific mechanisms.
+- postalservice's zero-dep design means there are no compatibility issues with alternative runtimes.

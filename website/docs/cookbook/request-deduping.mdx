@@ -1,0 +1,59 @@
+---
+sidebar_position: 2
+title: Request deduping
+---
+
+# Request deduplication
+
+## Use case
+
+Prevent duplicate concurrent requests to the same endpoint. If a request is already in flight, return the same promise instead of making a new network call.
+
+## Interceptor recipe
+
+```ts
+import { createClient } from 'postalservice'
+import type { HttpResponse } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const inFlight = new Map<string, Promise<HttpResponse<unknown>>>()
+
+http.interceptors.request.use((config) => {
+  const key = `${config.method ?? 'GET'}:${config.url}`
+  const existing = inFlight.get(key)
+  if (existing) {
+    // Abort this request; caller will get the in-flight promise
+    const controller = new AbortController()
+    controller.abort()
+    return { ...config, signal: controller.signal }
+  }
+  return config
+})
+```
+
+A simpler approach is to deduplicate at the service layer:
+
+```ts
+const inFlight = new Map<string, Promise<unknown>>()
+
+async function deduped<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key)
+  if (existing) return existing as Promise<T>
+
+  const promise = fn().finally(() => inFlight.delete(key))
+  inFlight.set(key, promise)
+  return promise
+}
+
+// Usage:
+const user = await deduped('user:me', () =>
+  http.get('/users/me').then((r) => r.data),
+)
+```
+
+## Notes
+
+- Deduplication is most useful for GET requests. Avoid deduplicating POST/PUT/DELETE.
+- The in-flight map uses string keys. Customise the key generation for requests with different params.
+- Clean up the map entry in `.finally()` to prevent memory leaks.

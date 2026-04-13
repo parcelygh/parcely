@@ -9,10 +9,13 @@
     "docs:dev": "pnpm --filter website start",
     "docs:build": "pnpm --filter website build",
     "docs:serve": "pnpm --filter website serve",
-    "clean": "pnpm -r clean"
+    "clean": "pnpm -r clean",
+    "check-docs-coverage": "tsx scripts/check-docs-coverage.ts",
+    "check-doc-snippets": "tsx scripts/check-doc-snippets.ts"
   },
   "devDependencies": {
     "rimraf": "^6.1.3",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   }
 }

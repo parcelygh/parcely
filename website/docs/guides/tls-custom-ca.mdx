@@ -1,0 +1,72 @@
+---
+sidebar_position: 23
+title: "TLS: custom CA"
+---
+
+# TLS: custom CA bundles
+
+## Use case
+
+Connect to servers signed by an internal certificate authority (Node.js only).
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+import { readFileSync } from 'node:fs'
+
+const http = createClient({
+  baseURL: 'https://internal.corp.example.com',
+  tls: {
+    ca: readFileSync('/etc/ssl/internal-ca.pem', 'utf-8'),
+  },
+})
+
+const { data } = await http.get('/api/status')
+```
+
+## Multiple CAs
+
+Pass an array of PEM strings:
+
+```ts
+const http = createClient({
+  baseURL: 'https://internal.corp.example.com',
+  tls: {
+    ca: [
+      readFileSync('/etc/ssl/ca-1.pem', 'utf-8'),
+      readFileSync('/etc/ssl/ca-2.pem', 'utf-8'),
+    ],
+  },
+})
+```
+
+## Axios equivalent
+
+```ts
+// axios:
+import https from 'https'
+import { readFileSync } from 'node:fs'
+
+const http = axios.create({
+  baseURL: 'https://internal.corp.example.com',
+  httpsAgent: new https.Agent({
+    ca: readFileSync('/etc/ssl/internal-ca.pem', 'utf-8'),
+  }),
+})
+
+// postalservice:
+const http2 = createClient({
+  baseURL: 'https://internal.corp.example.com',
+  tls: {
+    ca: readFileSync('/etc/ssl/internal-ca.pem', 'utf-8'),
+  },
+})
+```
+
+## Notes and gotchas
+
+- The `ca` option accepts `string | string[]` (PEM-encoded certificates).
+- **Node-only.** In browsers and other runtimes, `tls` is ignored with a one-shot `console.warn`.
+- You can combine `ca` with `rejectUnauthorized: true` (the default) to enforce validation against your custom CA while still rejecting unknown certificates.
+- The `TlsConfig` type: `{ rejectUnauthorized?: boolean; ca?: string | string[] }`.

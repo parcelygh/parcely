@@ -1,0 +1,55 @@
+---
+sidebar_position: 3
+title: Response caching
+---
+
+# Response caching
+
+## Use case
+
+Cache GET responses in memory to avoid redundant network calls within a time window.
+
+## Simple LRU cache recipe
+
+```ts
+import { createClient } from 'postalservice'
+import type { HttpResponse } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+interface CacheEntry {
+  response: HttpResponse<unknown>
+  expiry: number
+}
+
+const cache = new Map<string, CacheEntry>()
+const TTL = 30_000 // 30 seconds
+
+http.interceptors.request.use((config) => {
+  if ((config.method ?? 'GET').toUpperCase() !== 'GET') return config
+
+  const key = `GET:${config.url}`
+  const entry = cache.get(key)
+  if (entry && entry.expiry > Date.now()) {
+    // We will handle this in the response interceptor
+    return { ...config, headers: { ...config.headers, 'x-cache': 'HIT' } }
+  }
+  cache.delete(key)
+  return config
+})
+
+http.interceptors.response.use((response) => {
+  if ((response.config.method ?? 'GET').toUpperCase() === 'GET') {
+    const key = `GET:${response.config.url}`
+    cache.set(key, { response, expiry: Date.now() + TTL })
+  }
+  return response
+})
+```
+
+## Notes
+
+- This is a simple in-memory cache. For production, consider libraries like `lru-cache`.
+- Cache invalidation is the hard part. Clear the cache on mutations or use TTLs.
+- Consider the `Map` size growing unbounded. Implement eviction or use a bounded cache.
+- For server-side caching, respect `Cache-Control` headers from the API.

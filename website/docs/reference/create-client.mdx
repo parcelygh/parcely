@@ -1,0 +1,41 @@
+---
+sidebar_position: 1
+title: createClient
+---
+
+# createClient
+
+Creates a new HTTP client instance with the given default configuration.
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient(defaults?: RequestConfig): Client
+```
+
+## Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `defaults` | `RequestConfig` | Optional default configuration applied to every request. |
+
+## Returns
+
+A [`Client`](/docs/reference/client) instance.
+
+## Example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  headers: { Accept: 'application/json' },
+  timeout: 5000,
+})
+```
+
+## See also
+
+- [`Client`](/docs/reference/client) -- the client interface
+- [`RequestConfig`](/docs/reference/request-config) -- all configuration options

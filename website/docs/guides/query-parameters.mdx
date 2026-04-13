@@ -1,0 +1,57 @@
+---
+sidebar_position: 4
+title: Query parameters
+---
+
+# Query parameters
+
+## Use case
+
+Append query parameters to the URL from a typed object, including arrays and nested values.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const { data } = await http.get('/search', {
+  params: { q: 'hello', page: 1, limit: 20 },
+})
+// Requests: /search?q=hello&page=1&limit=20
+```
+
+## Arrays
+
+```ts
+await http.get('/items', {
+  params: { ids: [1, 2, 3] },
+})
+// Requests: /items?ids=1&ids=2&ids=3
+```
+
+## Nested objects
+
+```ts
+await http.get('/filter', {
+  params: { filter: { status: 'active', role: 'admin' } },
+})
+```
+
+## Axios equivalent
+
+```ts
+// axios:
+await http.get('/search', { params: { q: 'hello', page: 1 } })
+
+// postalservice (identical):
+await http.get('/search', { params: { q: 'hello', page: 1 } })
+```
+
+## Notes and gotchas
+
+- `params` is typed as `Record<string, unknown>`.
+- `null` and `undefined` values are omitted from the query string.
+- Parameters are appended to any query string already present in the `url`.
+- postalservice does not provide a `paramsSerializer` config option. The built-in serialiser handles all common cases. If you need custom serialisation, build the query string yourself and append it to the URL.

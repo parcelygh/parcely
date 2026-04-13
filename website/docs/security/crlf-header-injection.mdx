@@ -1,0 +1,41 @@
+---
+sidebar_position: 5
+title: CRLF header injection
+---
+
+# CRLF header injection defense
+
+## The threat
+
+CRLF (Carriage Return Line Feed) injection occurs when `\r\n` characters in header values allow an attacker to inject additional HTTP headers or split the response. This can lead to HTTP response splitting, cache poisoning, or session fixation.
+
+## How postalservice prevents it
+
+postalservice constructs all request headers using the native `Headers` API. The `Headers` constructor and `set`/`append` methods validate header names and values, rejecting any that contain `\r`, `\n`, or `\0` characters.
+
+If a CRLF injection is detected, postalservice throws `HttpError` with `code: 'ERR_CRLF_INJECTION'`.
+
+## Example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+// This throws HttpError with code: 'ERR_CRLF_INJECTION'
+await http.get('/data', {
+  headers: { 'X-Custom': 'value\r\nInjected-Header: malicious' },
+})
+```
+
+## Security table reference
+
+This corresponds to row 6 in the [security defaults table](/docs/security/threat-model):
+
+| # | Defense | Default |
+|---|---|---|
+| 6 | CRLF injection defense via native `Headers` API | Always on |
+
+## Always on
+
+This defense cannot be disabled. The native `Headers` API enforces this at the platform level.

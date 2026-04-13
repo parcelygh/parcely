@@ -1,0 +1,88 @@
+---
+sidebar_position: 9
+title: "@postalservice/auth-token"
+---
+
+# @postalservice/auth-token
+
+Attach tokens to requests and optionally refresh on 401.
+
+```ts
+import { createAuthToken } from '@postalservice/auth-token'
+```
+
+## createAuthToken(options)
+
+Creates an auth-token handler that can be installed on a client.
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `scheme` | `string` | `'Bearer'` | The auth scheme prefix: `'Bearer'`, `'Basic'`, `'Token'`, or any custom string. |
+| `getToken` | `() => Promise<string \| null \| undefined>` | (required) | Async function that returns the current token. Called on every request. |
+| `header` | `string` | `'Authorization'` | The header name to set. Can be `'X-API-Key'` or any custom header. |
+| `refreshOn` | `number[]` | `[]` | HTTP status codes that trigger a token refresh (e.g., `[401]`). |
+| `refresh` | `() => Promise<string>` | `undefined` | Async function that refreshes the token and returns the new token. Required if `refreshOn` is set. |
+
+### Return value
+
+```ts
+{
+  request: InterceptorHandler<RequestConfig>
+  response: InterceptorHandler<HttpResponse<unknown>>[]
+  install(client: Client): void
+}
+```
+
+| Property | Description |
+|---|---|
+| `request` | A request interceptor handler that attaches the token. |
+| `response` | A response interceptor handler (array) for refresh logic. |
+| `install(client)` | Convenience method that wires both request and response interceptors onto the client. |
+
+## Key behaviour
+
+- **Single-flight refresh:** When multiple requests receive a 401 concurrently, only one refresh call is made. All waiting requests share the same refresh promise.
+- **Retry once:** After a successful refresh, the original failed request is retried once with the new token.
+- **Bounded retry:** If the retried request also returns a refresh-triggering status, it is not retried again (prevents infinite loops).
+- **Refresh failure:** If the refresh call itself fails, the original error propagates to the caller.
+
+## Example
+
+```ts
+import { createClient } from 'postalservice'
+import { createAuthToken } from '@postalservice/auth-token'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+const refreshClient = createClient({ baseURL: 'https://api.example.com' })
+
+const auth = createAuthToken({
+  scheme: 'Bearer',
+  getToken: async () => localStorage.getItem('access_token'),
+  header: 'Authorization',
+  refreshOn: [401],
+  refresh: async () => {
+    const r = await refreshClient.post('/auth/refresh')
+    localStorage.setItem('access_token', r.data.access)
+    return r.data.access
+  },
+})
+
+auth.install(http)
+```
+
+## Manual installation
+
+```ts
+http.interceptors.request.use(auth.request)
+for (const handler of auth.response) {
+  http.interceptors.response.use(handler)
+}
+```
+
+## See also
+
+- [Auth: Bearer, Basic, custom](/docs/guides/auth-bearer-basic-custom)
+- [Auth refresh on 401](/docs/guides/auth-refresh-on-401)
+- [`InterceptorHandler`](/docs/reference/interceptor-handler)

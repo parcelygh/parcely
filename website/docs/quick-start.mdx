@@ -1,0 +1,90 @@
+---
+sidebar_position: 3
+---
+
+# Quick start
+
+## 1. Install
+
+```bash
+npm install postalservice
+```
+
+## 2. Create a client
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  headers: { Accept: 'application/json' },
+  timeout: 5000,
+})
+```
+
+## 3. Make requests
+
+```ts
+// GET
+const { data, status } = await http.get('/users/me')
+
+// POST with JSON body
+await http.post('/users', { name: 'Mickey' })
+
+// PUT
+await http.put('/users/1', { name: 'Updated' })
+
+// DELETE
+await http.delete('/users/1')
+```
+
+## 4. Handle errors
+
+```ts
+import { isHttpError } from 'postalservice'
+
+try {
+  await http.get('/might-fail')
+} catch (err) {
+  if (isHttpError(err)) {
+    console.log(err.code)       // e.g. 'ERR_HTTP_STATUS'
+    console.log(err.status)     // e.g. 404
+    console.log(err.response)   // the HttpResponse envelope, if available
+  }
+}
+```
+
+## 5. Add interceptors
+
+```ts
+// Request interceptor
+http.interceptors.request.use((config) => ({
+  ...config,
+  headers: { ...config.headers, 'X-Request-Id': crypto.randomUUID() },
+}))
+
+// Response interceptor
+http.interceptors.response.use(
+  (response) => response,
+  (err) => { console.error(err); throw err },
+)
+```
+
+## 6. Validate responses at runtime (optional)
+
+```ts
+import { z } from 'zod'
+
+const UserSchema = z.object({ id: z.string(), name: z.string() })
+
+const { data } = await http.get('/users/me', {
+  validate: UserSchema,
+})
+// data is typed as { id: string; name: string }
+```
+
+## Next steps
+
+- [Migrating from axios](/docs/migrating-from-axios) -- side-by-side comparison of every pattern
+- [Guides](/docs/guides/baseurl-and-defaults) -- detailed how-tos for each use case
+- [API Reference](/docs/reference/create-client) -- full option documentation

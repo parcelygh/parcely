@@ -1,0 +1,52 @@
+---
+sidebar_position: 11
+title: Retries with backoff
+---
+
+# Retries with exponential backoff
+
+## Use case
+
+Retry failed requests (network errors, 5xx responses) with increasing delays between attempts.
+
+## Interceptor recipe
+
+postalservice does not include a built-in retry mechanism in v1 (a `@postalservice/retry` package is planned). Here is a response interceptor recipe:
+
+```ts
+import { createClient, isHttpError } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const MAX_RETRIES = 3
+const RETRY_DELAY = 1000
+
+http.interceptors.response.use(undefined, async (err) => {
+  if (!isHttpError(err)) throw err
+
+  const retryCount = (err.config as { _retryCount?: number })._retryCount ?? 0
+  const isRetryable =
+    err.code === 'ERR_NETWORK' ||
+    err.code === 'ERR_TIMEOUT' ||
+    (err.status !== undefined && err.status >= 500)
+
+  if (!isRetryable || retryCount >= MAX_RETRIES) throw err
+
+  const delay = RETRY_DELAY * Math.pow(2, retryCount)
+  await new Promise((resolve) => setTimeout(resolve, delay))
+
+  const retryConfig = { ...err.config, _retryCount: retryCount + 1 }
+  return http.request(retryConfig)
+})
+```
+
+## Axios equivalent
+
+The pattern is the same in axios -- a response interceptor with retry logic. Libraries like `axios-retry` wrap this; a similar `@postalservice/retry` package is planned.
+
+## Notes and gotchas
+
+- The `_retryCount` field is a convention stored on the config. Since `RequestConfig` uses explicit fields, you may need a type assertion for custom metadata.
+- Be careful with non-idempotent methods (POST, PATCH). Consider retrying only GET, HEAD, OPTIONS, or checking the method in the interceptor.
+- Exponential backoff with jitter (`delay * (0.5 + Math.random() * 0.5)`) is recommended for production use.
+- The built-in `timeout` still applies per attempt. Each retry starts a fresh timeout.

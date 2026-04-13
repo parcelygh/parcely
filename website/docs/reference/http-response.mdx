@@ -1,0 +1,62 @@
+---
+sidebar_position: 4
+title: HttpResponse
+---
+
+# HttpResponse\<T\>
+
+The response envelope returned by all client methods.
+
+```ts
+interface HttpResponse<T> {
+  data: T
+  status: number
+  statusText: string
+  headers: Headers
+  config: RequestConfig
+}
+```
+
+## Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `data` | `T` | The parsed response body. Type depends on `responseType` and any `validate` function. |
+| `status` | `number` | HTTP status code (e.g., 200, 201, 204). |
+| `statusText` | `string` | HTTP status text (e.g., `'OK'`, `'Created'`). |
+| `headers` | `Headers` | Response headers as a native `Headers` object. |
+| `config` | `RequestConfig` | The merged request config, with sensitive header values redacted. |
+
+## Data type by responseType
+
+| `responseType` | `data` type |
+|---|---|
+| `'json'` (default) | Parsed JSON (typed as `T`) |
+| `'text'` | `string` |
+| `'arraybuffer'` | `ArrayBuffer` |
+| `'blob'` | `Blob` |
+
+## Example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const response = await http.get<{ id: string; name: string }>('/users/me')
+
+console.log(response.data)       // { id: '1', name: 'Mickey' }
+console.log(response.status)     // 200
+console.log(response.statusText) // 'OK'
+console.log(response.headers.get('content-type')) // 'application/json'
+console.log(response.config.url) // '/users/me'
+```
+
+## Config redaction
+
+The `config` field has sensitive header values replaced with `'[REDACTED]'`. This is safe to log. Request interceptors see the live un-redacted config.
+
+## See also
+
+- [`RequestConfig`](/docs/reference/request-config)
+- [`HttpError`](/docs/reference/http-error)

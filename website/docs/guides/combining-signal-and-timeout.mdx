@@ -1,0 +1,48 @@
+---
+sidebar_position: 10
+title: Signal + timeout
+---
+
+# Combining user signal with timeout
+
+## Use case
+
+You want both a per-request timeout and the ability to cancel manually. postalservice handles this automatically.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const controller = new AbortController()
+
+await http.get('/data', {
+  signal: controller.signal,
+  timeout: 5000,
+})
+
+// Either:
+// - The user calls controller.abort() → ERR_ABORTED
+// - 5 seconds elapse → ERR_TIMEOUT
+// - The request completes → success
+```
+
+## How it works
+
+Internally, postalservice uses `AbortSignal.any([userSignal, AbortSignal.timeout(ms)])` to combine both signals. Whichever fires first wins:
+
+- User abort: `HttpError` with `code: 'ERR_ABORTED'`
+- Timeout: `HttpError` with `code: 'ERR_TIMEOUT'`
+
+## Axios equivalent
+
+In axios, timeout and signal are also independent. The behaviour is similar, but axios uses different error codes (`ECONNABORTED` for timeout).
+
+## Notes and gotchas
+
+- `AbortSignal.any` is available in Node 20+, all modern browsers, Bun, and Deno.
+- Timers are always cleaned up in `finally`, even when the request succeeds or the user signal fires.
+- If only `timeout` is set (no `signal`), postalservice uses `AbortSignal.timeout(ms)` directly.
+- If only `signal` is set (no `timeout`), it is passed to `fetch` as-is.

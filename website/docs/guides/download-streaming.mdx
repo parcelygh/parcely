@@ -1,0 +1,42 @@
+---
+sidebar_position: 17
+title: Download streaming
+---
+
+# Streaming downloads
+
+## Use case
+
+Consume a response body incrementally as a `ReadableStream` rather than buffering the entire response into memory.
+
+## Current status
+
+postalservice v1 supports `responseType` values of `'json'`, `'text'`, `'arraybuffer'`, and `'blob'`. A `'stream'` response type that returns the raw `ReadableStream` is planned for a future release.
+
+## Workaround: download progress with blob
+
+For large downloads, use `onDownloadProgress` to track progress while downloading into a blob:
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const { data } = await http.get('/large-file', {
+  responseType: 'blob',
+  onDownloadProgress: ({ loaded, total, percent }) => {
+    console.log(`Downloaded: ${loaded} bytes (${percent ?? '?'}%)`)
+  },
+})
+// data is a Blob
+```
+
+## Axios equivalent
+
+Axios provides `responseType: 'stream'` in Node.js, which returns a Node `Readable`. postalservice does not currently provide this. Use the `onDownloadProgress` callback for incremental tracking.
+
+## Notes and gotchas
+
+- A `responseType: 'stream'` option is on the roadmap.
+- For very large files in Node, consider using the native `fetch` API directly with `response.body` (a Web `ReadableStream`) if you need true streaming.
+- The `onDownloadProgress` callback fires as chunks arrive, giving you incremental visibility even though the full response is buffered.
