@@ -2,6 +2,10 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    include: ['src/**/*.test.ts', 'test/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'test/**/*.test.ts', 'test/**/*.test-d.ts'],
+    typecheck: {
+      enabled: true,
+      include: ['test/**/*.test-d.ts'],
+    },
   },
 });
