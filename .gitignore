@@ -1,2 +1,14 @@
 dist
 node_modules
+
+# Docusaurus
+website/build/
+website/.docusaurus/
+website/node_modules/
+
+# Package build outputs
+packages/*/dist/
+packages/*/node_modules/
+
+# TypeScript build info
+*.tsbuildinfo
