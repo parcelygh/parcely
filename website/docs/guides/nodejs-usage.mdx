@@ -1,0 +1,72 @@
+---
+sidebar_position: 18
+title: Node.js usage
+---
+
+# Node.js usage
+
+## Use case
+
+Use postalservice in a Node.js 20+ application.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  timeout: 5000,
+})
+
+const { data } = await http.get('/users')
+console.log(data)
+```
+
+No special configuration needed. postalservice uses `globalThis.fetch`, which is available in Node 20+.
+
+## TLS overrides
+
+For self-signed certificates or custom CA bundles, use the `tls` option:
+
+```ts
+const http = createClient({
+  baseURL: 'https://internal.example.com',
+  tls: {
+    rejectUnauthorized: false, // accept self-signed certs (dev only!)
+  },
+})
+```
+
+See the [TLS: self-signed certs](/docs/guides/tls-self-signed) and [TLS: custom CA](/docs/guides/tls-custom-ca) guides for details.
+
+## File uploads from disk
+
+```ts
+import { createReadStream } from 'node:fs'
+
+await http.post('/upload', createReadStream('./data.csv'), {
+  headers: { 'Content-Type': 'text/csv' },
+})
+```
+
+## Axios equivalent
+
+```ts
+// axios in Node:
+import axios from 'axios'
+const http = axios.create({ baseURL: 'https://api.example.com' })
+const { data } = await http.get('/users')
+
+// postalservice (identical pattern):
+import { createClient } from 'postalservice'
+const http2 = createClient({ baseURL: 'https://api.example.com' })
+const { data: d2 } = await http2.get('/users')
+```
+
+## Notes and gotchas
+
+- Requires Node 20 or later (for `globalThis.fetch` and `AbortSignal.any`).
+- The `tls` option triggers a lazy `await import('undici')` to create a custom dispatcher. This is the only time postalservice imports a Node-specific module.
+- `tls.rejectUnauthorized: false` emits a one-shot `console.warn` to remind you not to use it in production.
+- Node `fs.ReadStream` bodies are transparently converted to Web `ReadableStream`.

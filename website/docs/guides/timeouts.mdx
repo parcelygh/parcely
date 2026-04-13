@@ -1,0 +1,59 @@
+---
+sidebar_position: 8
+title: Timeouts
+---
+
+# Timeouts
+
+## Use case
+
+Abort requests that take too long, either at the client level or per request.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  timeout: 5000, // 5 seconds for all requests
+})
+
+// Override per request
+await http.get('/slow-endpoint', { timeout: 30000 })
+```
+
+## How it works
+
+postalservice creates an `AbortSignal.timeout(ms)` and combines it with any user-provided `signal` via `AbortSignal.any`. When the timeout fires, the request throws `HttpError` with `code: 'ERR_TIMEOUT'`.
+
+```ts
+import { isHttpError } from 'postalservice'
+
+try {
+  await http.get('/slow')
+} catch (err) {
+  if (isHttpError(err) && err.code === 'ERR_TIMEOUT') {
+    console.log('Request timed out')
+  }
+}
+```
+
+## Axios equivalent
+
+```ts
+// axios:
+await http.get('/slow', { timeout: 5000 })
+
+// postalservice (identical):
+await http.get('/slow', { timeout: 5000 })
+```
+
+In axios, the timeout error has `code: 'ECONNABORTED'`. In postalservice it is `code: 'ERR_TIMEOUT'`.
+
+## Notes and gotchas
+
+- Timeout is in milliseconds.
+- Timers are cleaned up in `finally` -- no leaked timers on success or other errors.
+- If both `timeout` and `signal` are provided, whichever fires first aborts the request. A user signal abort produces `ERR_ABORTED`; a timeout produces `ERR_TIMEOUT`.
+- A `timeout` of `0` or `undefined` means no timeout.

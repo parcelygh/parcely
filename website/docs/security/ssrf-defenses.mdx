@@ -1,0 +1,67 @@
+---
+sidebar_position: 2
+title: SSRF defenses
+---
+
+# SSRF defenses
+
+## The threat
+
+Server-Side Request Forgery (SSRF) occurs when an attacker can influence the URL a server-side HTTP client requests. In axios, this was exploitable via CVE-2024-39338 and CVE-2025-27152, where absolute URLs or protocol-relative URLs (`//evil.com/path`) could override the configured `baseURL`.
+
+## How postalservice prevents it
+
+### 1. Reject absolute URLs when `baseURL` is set
+
+When a `baseURL` is configured, postalservice rejects any `url` that is absolute (starts with a protocol like `http:` or `https:`, or is protocol-relative like `//host/path`). This is controlled by:
+
+```ts
+const http = createClient({
+  baseURL: 'https://api.internal.com',
+  allowAbsoluteUrls: false, // this is the default when baseURL is set
+})
+
+// This throws HttpError with code: 'ERR_ABSOLUTE_URL'
+await http.get('https://evil.com/steal-data')
+
+// This also throws (protocol-relative URL)
+await http.get('//evil.com/steal-data')
+
+// This works (relative URL)
+await http.get('/users/me')
+```
+
+### 2. Protocol allowlist
+
+Even without a `baseURL`, postalservice restricts which URI schemes are permitted:
+
+```ts
+const http = createClient({
+  allowedProtocols: ['http:', 'https:'], // default
+})
+
+// This throws HttpError with code: 'ERR_DISALLOWED_PROTOCOL'
+await http.get('file:///etc/passwd')
+```
+
+## Security table reference
+
+These defenses correspond to rows 1 and 2 in the [security defaults table](/docs/security/threat-model):
+
+| # | Defense | Default |
+|---|---|---|
+| 1 | Reject absolute URLs when `baseURL` is set | `allowAbsoluteUrls: false` |
+| 2 | URI scheme allowlist | `allowedProtocols: ['http:', 'https:']` |
+
+## Opting out
+
+If you genuinely need to send requests to arbitrary URLs:
+
+```ts
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  allowAbsoluteUrls: true, // allow absolute URLs
+})
+```
+
+This should be rare. If you find yourself opting out, consider whether the URL input is user-controlled and whether that creates an SSRF risk.

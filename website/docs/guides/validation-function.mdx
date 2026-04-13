@@ -1,0 +1,76 @@
+---
+sidebar_position: 27
+title: Validation with a function
+---
+
+# Runtime validation with a plain function
+
+## Use case
+
+Validate API responses using a simple function without any schema library.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+interface User {
+  id: string
+  name: string
+}
+
+function validateUser(input: unknown): User {
+  if (
+    typeof input === 'object' && input !== null &&
+    'id' in input && typeof (input as User).id === 'string' &&
+    'name' in input && typeof (input as User).name === 'string'
+  ) {
+    return input as User
+  }
+  throw new Error('Invalid user data')
+}
+
+const { data } = await http.get('/users/me', {
+  validate: validateUser,
+})
+// data is typed as User
+```
+
+## How it works
+
+postalservice's `Validator<T>` type accepts `(input: unknown) => T` functions. The function receives the parsed response body. If it returns a value, that value becomes `data`. If it throws, postalservice wraps the error in `HttpError` with `code: 'ERR_VALIDATION'`.
+
+## Error handling
+
+```ts
+import { isHttpError } from 'postalservice'
+
+try {
+  await http.get('/users/me', { validate: validateUser })
+} catch (err) {
+  if (isHttpError(err) && err.code === 'ERR_VALIDATION') {
+    console.log('Validation failed:', err.cause)
+  }
+}
+```
+
+## Axios equivalent
+
+Axios does not support validation. You would validate after the response:
+
+```ts
+// axios:
+const { data } = await http.get('/users/me')
+const user = validateUser(data) // manual
+
+// postalservice (integrated):
+const { data: user } = await http.get('/users/me', { validate: validateUser })
+```
+
+## Notes and gotchas
+
+- The function validator is the simplest option -- no library needed.
+- Resolution order for the `Validator<T>` type: Standard Schema v1 (detected via `~standard` property), then `.parse()` method, then function call.
+- The validator runs after response parsing and before the response envelope is returned.

@@ -1,0 +1,82 @@
+---
+sidebar_position: 6
+title: Logging middleware
+---
+
+# Logging middleware
+
+## Use case
+
+Log all HTTP requests and responses for debugging or auditing, with timing information.
+
+## Interceptor recipe
+
+```ts
+import { createClient, isHttpError } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+http.interceptors.request.use((config) => {
+  const start = Date.now()
+  return { ...config, headers: { ...config.headers }, _startTime: start } as typeof config
+})
+
+http.interceptors.response.use(
+  (response) => {
+    const method = response.config.method ?? 'GET'
+    const url = response.config.url ?? ''
+    console.log(
+      `[HTTP] ${method.toUpperCase()} ${url} -> ${response.status} (${response.statusText})`,
+    )
+    return response
+  },
+  (err) => {
+    if (isHttpError(err)) {
+      const method = err.config.method ?? 'GET'
+      const url = err.config.url ?? ''
+      console.error(
+        `[HTTP] ${method.toUpperCase()} ${url} -> ${err.code} ${err.status ?? ''}`,
+      )
+    }
+    throw err
+  },
+)
+```
+
+## Structured logging
+
+For production, emit structured JSON logs:
+
+```ts
+http.interceptors.response.use(
+  (response) => {
+    console.log(JSON.stringify({
+      level: 'info',
+      type: 'http_response',
+      method: response.config.method ?? 'GET',
+      url: response.config.url,
+      status: response.status,
+    }))
+    return response
+  },
+  (err) => {
+    if (isHttpError(err)) {
+      console.log(JSON.stringify({
+        level: 'error',
+        type: 'http_error',
+        method: err.config.method ?? 'GET',
+        url: err.config.url,
+        code: err.code,
+        status: err.status,
+      }))
+    }
+    throw err
+  },
+)
+```
+
+## Notes
+
+- Sensitive headers are already redacted in `response.config` and `err.config` (see [Logging and redaction](/docs/guides/logging-and-redaction)).
+- Request interceptors see the live config; response interceptors see the redacted config.
+- For detailed logging, see the [logging and redaction guide](/docs/guides/logging-and-redaction).

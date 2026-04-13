@@ -1,0 +1,62 @@
+---
+sidebar_position: 3
+title: Response types
+---
+
+# JSON, text, blob, and ArrayBuffer responses
+
+## Use case
+
+Control how the response body is parsed. By default postalservice returns parsed JSON, but you can request text, binary data, or blobs.
+
+## JSON (default)
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const { data } = await http.get('/users/me')
+// data is the parsed JSON object
+```
+
+postalservice is content-type-aware: if the response `Content-Type` is not a JSON type, the body is returned as raw text instead of crashing with a `SyntaxError`.
+
+## Text
+
+```ts
+const { data } = await http.get('/readme', { responseType: 'text' })
+// data is a string
+```
+
+## ArrayBuffer
+
+```ts
+const { data } = await http.get('/image.png', { responseType: 'arraybuffer' })
+// data is an ArrayBuffer
+```
+
+## Blob
+
+```ts
+const { data } = await http.get('/document.pdf', { responseType: 'blob' })
+// data is a Blob
+```
+
+## Axios equivalent
+
+```ts
+// axios:
+const { data } = await http.get('/file', { responseType: 'arraybuffer' })
+
+// postalservice (identical):
+const { data: d } = await http.get('/file', { responseType: 'arraybuffer' })
+```
+
+Both libraries support `'json'`, `'text'`, `'arraybuffer'`, and `'blob'`. Axios additionally supports `'stream'` (Node) and `'document'` (browser DOM), which postalservice does not provide.
+
+## Notes and gotchas
+
+- The `responseType` type is `'json' | 'text' | 'arraybuffer' | 'blob'`.
+- When `responseType` is `'json'` (default), postalservice sniffs the `Content-Type` header. If it does not indicate JSON, the response is returned as text to avoid parse errors.
+- If JSON parsing fails even with a JSON content type, postalservice throws `HttpError` with `code: 'ERR_PARSE'`.

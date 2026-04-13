@@ -1,0 +1,68 @@
+---
+sidebar_position: 15
+title: Upload progress
+---
+
+# Upload progress tracking
+
+## Use case
+
+Show a progress bar during file uploads.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const form = new FormData()
+form.set('file', largeFile)
+
+await http.post('/upload', form, {
+  onUploadProgress: ({ loaded, total, percent }) => {
+    console.log(`${loaded} / ${total} bytes (${percent}%)`)
+  },
+})
+```
+
+## Progress event shape
+
+```ts
+interface ProgressEvent {
+  loaded: number       // bytes transferred so far
+  total?: number       // total bytes (undefined if unknown)
+  percent?: number     // 0–100 (undefined if total is unknown)
+}
+```
+
+## Runtime support matrix
+
+| Runtime | Upload progress support |
+|---|---|
+| Node 20+ | Full support via `ReadableStream` request body wrapping |
+| Chromium 105+ | Full support via `duplex: 'half'` + `ReadableStream` request body |
+| Safari / Firefox | Terminal callback only (`loaded === total` on completion) |
+
+On Safari and Firefox, `fetch` does not support streaming request bodies. postalservice falls back to a single progress callback at completion and emits a one-shot `console.warn` explaining the browser limitation in development mode.
+
+## Axios equivalent
+
+```ts
+// axios:
+await http.post('/upload', form, {
+  onUploadProgress: (e) => console.log(e.loaded, e.total),
+})
+
+// postalservice (adds percent):
+await http.post('/upload', form, {
+  onUploadProgress: ({ loaded, total, percent }) =>
+    console.log(loaded, total, percent),
+})
+```
+
+## Notes and gotchas
+
+- postalservice automatically sets `duplex: 'half'` on the fetch options when `onUploadProgress` is provided and the body is streamable.
+- `total` and `percent` are `undefined` when the stream length is not knowable.
+- Stream errors during upload produce `HttpError` with `code: 'ERR_NETWORK'`.

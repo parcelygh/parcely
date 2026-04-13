@@ -1,0 +1,40 @@
+---
+sidebar_position: 101
+title: Roadmap
+---
+
+# Roadmap
+
+postalservice is structured as a monorepo with reserved slots for future subpackages. These are intentionally not built in v1 so the core stays small and focused.
+
+## Reserved subpackage slots
+
+### `@postalservice/retry`
+
+Interceptor-based retry policies with exponential backoff, jitter, and configurable retry conditions.
+
+**Status:** Planned. In the meantime, see the [retries with backoff guide](/docs/guides/retries-with-backoff) for an interceptor recipe.
+
+### `@postalservice/react`
+
+React hooks for data fetching: `useHttp()`, SWR-like caching, and TanStack Query integration helpers.
+
+**Status:** Planned. In the meantime, see the [React usage guide](/docs/guides/react-usage) for custom hook patterns.
+
+### `@postalservice/upload-node`
+
+Node-specific upload utilities: file-path convenience helpers (`uploadFile('./big.zip')`), chunked uploads, and resumable upload support.
+
+**Status:** Planned. In the meantime, see the [Node ReadStream upload guide](/docs/guides/uploads-node-readstream) for streaming uploads from disk.
+
+## Future considerations
+
+- `responseType: 'stream'` for true streaming response consumption
+- Host allowlists/blocklists for additional SSRF protection
+- Request/response size limits
+- mTLS / client certificate support
+- Minimum TLS version configuration
+
+## Contributing
+
+If you are interested in contributing to any of these areas, please open an issue to discuss the design before submitting a pull request.

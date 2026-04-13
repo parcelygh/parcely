@@ -1,0 +1,103 @@
+---
+sidebar_position: 5
+title: Auth (Bearer, Basic, custom)
+---
+
+# Auth: Bearer, Basic, and custom headers
+
+## Use case
+
+Attach authentication credentials to every request. You can do this manually with default headers, with a request interceptor, or with the `@postalservice/auth-token` addon.
+
+## Manual header
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  headers: {
+    Authorization: 'Bearer my-access-token',
+  },
+})
+```
+
+## Request interceptor
+
+For dynamic tokens (e.g., read from storage on each request):
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+http.interceptors.request.use((config) => ({
+  ...config,
+  headers: {
+    ...config.headers,
+    Authorization: `Bearer ${localStorage.getItem('token')}`,
+  },
+}))
+```
+
+## Using `@postalservice/auth-token`
+
+The `@postalservice/auth-token` addon provides a higher-level API:
+
+```ts
+import { createClient } from 'postalservice'
+import { createAuthToken } from '@postalservice/auth-token'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const auth = createAuthToken({
+  scheme: 'Bearer',
+  getToken: async () => localStorage.getItem('access_token'),
+})
+
+auth.install(http)
+```
+
+### Basic auth
+
+```ts
+const auth = createAuthToken({
+  scheme: 'Basic',
+  getToken: async () => btoa(`${username}:${password}`),
+})
+
+auth.install(http)
+```
+
+### Custom header
+
+```ts
+const auth = createAuthToken({
+  scheme: 'Token',
+  header: 'X-API-Key',
+  getToken: async () => apiKey,
+})
+
+auth.install(http)
+```
+
+## Axios equivalent
+
+In axios you would typically use an interceptor or the `auth` config option:
+
+```ts
+// axios auth config:
+await http.get('/data', { auth: { username: 'user', password: 'pass' } })
+
+// postalservice equivalent (manual):
+const encoded = btoa('user:pass')
+await http.get('/data', { headers: { Authorization: `Basic ${encoded}` } })
+```
+
+postalservice does not have a dedicated `auth` config key. Use headers directly or the `@postalservice/auth-token` addon.
+
+## Notes and gotchas
+
+- The `Authorization` header is in the default `sensitiveHeaders` list, so it is automatically stripped on cross-origin redirects.
+- The `Authorization` header value is redacted in error objects and the response envelope `config`.
+- `@postalservice/auth-token` supports custom `header` names (e.g., `X-API-Key`) and custom `scheme` strings.

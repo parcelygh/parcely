@@ -1,0 +1,419 @@
+---
+sidebar_position: 4
+title: Migrating from axios
+---
+
+# Migrating from axios
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+postalservice is designed so axios users feel at home immediately. This guide shows every common axios pattern alongside its postalservice equivalent, and includes a full feature-mapping table at the bottom.
+
+## Creating a client
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+import axios from 'axios'
+
+const http = axios.create({
+  baseURL: 'https://api.example.com',
+  headers: { Accept: 'application/json' },
+  timeout: 5000,
+})
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  headers: { Accept: 'application/json' },
+  timeout: 5000,
+})
+```
+
+</TabItem>
+</Tabs>
+
+## GET request
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+const { data, status, headers } = await http.get('/users/me')
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+const { data, status, headers } = await http.get('/users/me')
+```
+
+</TabItem>
+</Tabs>
+
+Identical syntax.
+
+## POST with JSON body
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+const { data } = await http.post('/users', { name: 'Mickey' })
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+const { data } = await http.post('/users', { name: 'Mickey' })
+```
+
+</TabItem>
+</Tabs>
+
+Identical syntax. Plain objects are JSON-serialised automatically.
+
+## Query parameters
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+await http.get('/search', { params: { q: 'hello', page: 1 } })
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+await http.get('/search', { params: { q: 'hello', page: 1 } })
+```
+
+</TabItem>
+</Tabs>
+
+## Request headers
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+await http.get('/data', {
+  headers: { Authorization: 'Bearer tok' },
+})
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+await http.get('/data', {
+  headers: { Authorization: 'Bearer tok' },
+})
+```
+
+</TabItem>
+</Tabs>
+
+## Error handling
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+import axios from 'axios'
+
+try {
+  await http.get('/fail')
+} catch (err) {
+  if (axios.isAxiosError(err)) {
+    console.log(err.response?.status)
+    console.log(err.code) // e.g. 'ECONNABORTED'
+  }
+}
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+import { isHttpError } from 'postalservice'
+
+try {
+  await http.get('/fail')
+} catch (err) {
+  if (isHttpError(err)) {
+    console.log(err.status)            // number | undefined
+    console.log(err.code)              // e.g. 'ERR_HTTP_STATUS'
+    console.log(err.response?.data)    // parsed response body
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+**Key differences:**
+- postalservice uses `isHttpError()` instead of `axios.isAxiosError()`.
+- Error codes are different: postalservice uses descriptive codes like `ERR_HTTP_STATUS`, `ERR_TIMEOUT`, `ERR_NETWORK`, `ERR_ABORTED`, `ERR_VALIDATION`, `ERR_PARSE`, `ERR_TOO_MANY_REDIRECTS`, `ERR_DISALLOWED_PROTOCOL`, `ERR_DISALLOWED_HEADER`, `ERR_ABSOLUTE_URL`, `ERR_CRLF_INJECTION`.
+- `err.status` is a top-level property (not only nested in `err.response`).
+
+## Interceptors
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+http.interceptors.request.use(
+  (config) => {
+    config.headers['X-Trace'] = crypto.randomUUID()
+    return config
+  },
+  (err) => Promise.reject(err),
+)
+
+http.interceptors.response.use(
+  (response) => response,
+  (err) => { console.error(err); return Promise.reject(err) },
+)
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+http.interceptors.request.use(
+  (config) => ({
+    ...config,
+    headers: { ...config.headers, 'X-Trace': crypto.randomUUID() },
+  }),
+  (err) => { throw err },
+)
+
+http.interceptors.response.use(
+  (response) => response,
+  (err) => { console.error(err); throw err },
+)
+```
+
+</TabItem>
+</Tabs>
+
+**Key difference:** postalservice configs are plain objects -- spread and return a new object rather than mutating. Error handlers can `throw` instead of `return Promise.reject()`.
+
+## Cancellation
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+const controller = new AbortController()
+await http.get('/data', { signal: controller.signal })
+controller.abort()
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+const controller = new AbortController()
+await http.get('/data', { signal: controller.signal })
+controller.abort()
+```
+
+</TabItem>
+</Tabs>
+
+Identical. postalservice does not support the legacy `CancelToken` API.
+
+## Timeouts
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+await http.get('/slow', { timeout: 3000 })
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+await http.get('/slow', { timeout: 3000 })
+```
+
+</TabItem>
+</Tabs>
+
+In postalservice, timeout is combined with a user-provided `signal` via `AbortSignal.any`, so both can coexist cleanly.
+
+## File upload with FormData
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+const form = new FormData()
+form.append('avatar', file)
+await http.post('/upload', form)
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+const form = new FormData()
+form.set('avatar', file)
+await http.post('/upload', form)
+```
+
+</TabItem>
+</Tabs>
+
+## Upload progress
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+await http.post('/upload', form, {
+  onUploadProgress: (e) => console.log(e.loaded, e.total),
+})
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+await http.post('/upload', form, {
+  onUploadProgress: ({ loaded, total, percent }) =>
+    console.log(loaded, total, percent),
+})
+```
+
+</TabItem>
+</Tabs>
+
+postalservice progress events include a `percent` field (0--100) when the total is known.
+
+## Download progress
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+const { data } = await http.get('/big-file', {
+  onDownloadProgress: (e) => console.log(e.loaded),
+})
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+const { data } = await http.get('/big-file', {
+  onDownloadProgress: ({ loaded, total, percent }) =>
+    console.log(loaded, total, percent),
+})
+```
+
+</TabItem>
+</Tabs>
+
+## Response types
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+const { data } = await http.get('/file', { responseType: 'arraybuffer' })
+```
+
+</TabItem>
+<TabItem value="postalservice" label="postalservice">
+
+```ts
+const { data } = await http.get('/file', { responseType: 'arraybuffer' })
+```
+
+</TabItem>
+</Tabs>
+
+postalservice supports `'json'` (default), `'text'`, `'arraybuffer'`, and `'blob'`. The axios `'stream'` and `'document'` types are not provided.
+
+## Runtime validation (new in postalservice)
+
+postalservice adds a `validate` option with no axios equivalent:
+
+```ts
+import { createClient } from 'postalservice'
+import { z } from 'zod'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+const User = z.object({ id: z.string(), name: z.string() })
+
+const { data } = await http.get('/users/me', { validate: User })
+// data is typed as { id: string; name: string }
+```
+
+Validators can be Zod schemas, Valibot schemas, ArkType types, objects with a `.parse()` method, or plain functions.
+
+## Feature-mapping table
+
+| axios config key | postalservice equivalent | Notes |
+|---|---|---|
+| `baseURL` | `baseURL` | Accepts `string \| URL`. When set, absolute URLs in `url` are rejected by default (SSRF protection). |
+| `url` | `url` | Relative path appended to `baseURL`. |
+| `method` | `method` | Same (`'GET'`, `'POST'`, etc.). |
+| `headers` | `headers` | Accepts `Record<string, string>`, `[string, string][]`, or `Headers`. |
+| `params` | `params` | `Record<string, unknown>`. Arrays and objects are serialised to query string. |
+| `data` | `body` (second argument to `.post()`, `.put()`, `.patch()`) | Renamed to `body` in the config object. Method helpers accept it as the second positional argument. |
+| `timeout` | `timeout` | Milliseconds. Combined with user `signal` via `AbortSignal.any`. |
+| `signal` | `signal` | Standard `AbortSignal`. |
+| `responseType` | `responseType` | `'json'` \| `'text'` \| `'arraybuffer'` \| `'blob'`. No `'stream'` or `'document'`. |
+| `maxRedirects` | `maxRedirects` | Default 5. Manual redirect loop with cross-origin header stripping. |
+| `onUploadProgress` | `onUploadProgress` | `(event: ProgressEvent) => void` where `ProgressEvent = { loaded, total?, percent? }`. |
+| `onDownloadProgress` | `onDownloadProgress` | Same shape as upload progress. |
+| `cancelToken` | Not provided | Use standard `AbortController` / `signal` instead. `CancelToken` is a legacy axios API. |
+| `transformRequest` | Not provided | Use a request interceptor instead. Interceptors are more composable and testable. |
+| `transformResponse` | Not provided | Use a response interceptor or `validate` for runtime type checking. |
+| `adapter` | Not provided | postalservice always uses `fetch`. For testing, stub `globalThis.fetch`. |
+| `auth` | Not provided as config | Use `headers: { Authorization: 'Bearer ...' }` or `@postalservice/auth-token`. |
+| `xsrfCookieName` / `xsrfHeaderName` | Not provided | XSRF token handling is better done at the framework level (e.g., meta tags). Use a request interceptor if needed. |
+| `maxContentLength` / `maxBodyLength` | Not provided | Not a v1 feature. Can be implemented via a response interceptor. |
+| `decompress` | Not provided | `fetch` handles decompression automatically. |
+| `httpAgent` / `httpsAgent` | `tls` | Node-only TLS config (`{ rejectUnauthorized?, ca? }`). Uses undici dispatcher under the hood. |
+| `proxy` | Not provided | Configure at the environment/runtime level. |
+| `validateStatus` | Not provided | Non-2xx responses always throw `HttpError` with code `ERR_HTTP_STATUS`. Use a response interceptor to customise. |
+| `paramsSerializer` | Not provided | Built-in serialiser handles arrays and nested objects. |
+| `formSerializer` | `formDataSerializer` | Controls how arrays and nested objects are serialised in auto-FormData: `'brackets'` (default), `'indices'`, or `'repeat'`. |
+| `withCredentials` | Not provided | Set `credentials: 'include'` via a request interceptor if needed. postalservice does not wrap the fetch `credentials` option. |
+| `withXSRFToken` | Not provided | Use a request interceptor to read cookies and set headers. |
+| N/A | `validate` | **New.** Runtime response validation via Standard Schema, `.parse()`, or function. |
+| N/A | `allowAbsoluteUrls` | **New.** When `false` (default when `baseURL` is set), rejects absolute URLs. Prevents SSRF. |
+| N/A | `allowedProtocols` | **New.** Default `['http:', 'https:']`. Blocks `file:`, `data:`, `javascript:`. |
+| N/A | `allowedRequestHeaders` | **New.** Opt-in allowlist of permitted request header names. |
+| N/A | `sensitiveHeaders` | **New.** Headers stripped on cross-origin redirects. |
+| N/A | `followRedirects` | **New.** Toggle manual redirect following (default `true`). |
+| N/A | `formDataSerializer` | **New.** `'brackets'` \| `'indices'` \| `'repeat'` for auto-FormData nested-key serialisation. |
+| N/A | `tls` | **New.** Node-only `{ rejectUnauthorized?, ca? }`. |
+
+## Breaking differences summary
+
+1. **Error shape.** `HttpError` has a `code` field with descriptive values (`ERR_HTTP_STATUS`, `ERR_TIMEOUT`, etc.) instead of axios's codes. Use `isHttpError()` instead of `axios.isAxiosError()`.
+2. **Envelope keys.** The response envelope has `data`, `status`, `statusText`, `headers`, and `config`. No `request` property.
+3. **No `transformRequest` / `transformResponse`.** Use interceptors instead.
+4. **No `CancelToken`.** Use `AbortController` (which axios also supports).
+5. **Body parameter.** The config property is `body` (not `data`). Method helpers (`.post()`, `.put()`, `.patch()`) still accept it as the second positional argument.
+6. **Headers are immutable.** Interceptors should spread and return a new config rather than mutating `config.headers`.
+7. **Secure defaults.** Absolute URLs are rejected when `baseURL` is set. Cross-origin redirects strip sensitive headers. These are opt-out if needed.

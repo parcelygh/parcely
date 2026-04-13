@@ -1,0 +1,58 @@
+---
+sidebar_position: 25
+title: Validation with Valibot
+---
+
+# Runtime validation with Valibot
+
+## Use case
+
+Validate API responses at runtime using Valibot, a lightweight schema library.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+import * as v from 'valibot'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const UserSchema = v.object({
+  id: v.string(),
+  name: v.string(),
+  email: v.pipe(v.string(), v.email()),
+})
+
+const { data } = await http.get('/users/me', {
+  validate: UserSchema,
+})
+// data is typed as { id: string; name: string; email: string }
+```
+
+## How it works
+
+Valibot 1+ implements Standard Schema v1, which postalservice accepts natively. No adapter is needed.
+
+## Error handling
+
+```ts
+import { isHttpError } from 'postalservice'
+
+try {
+  await http.get('/users/me', { validate: UserSchema })
+} catch (err) {
+  if (isHttpError(err) && err.code === 'ERR_VALIDATION') {
+    console.log('Validation failed:', err.cause)
+  }
+}
+```
+
+## Axios equivalent
+
+Axios has no built-in validation. postalservice supports it natively.
+
+## Notes and gotchas
+
+- Valibot is a dependency of your app, not of postalservice.
+- Valibot's tree-shakeable design pairs well with postalservice's own tree-shakeability.
+- The `Validator<T>` type supports Standard Schema v1 (Valibot 1+), `.parse()` objects, and plain functions.

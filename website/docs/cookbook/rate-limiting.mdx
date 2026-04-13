@@ -1,0 +1,39 @@
+---
+sidebar_position: 5
+title: Rate limiting
+---
+
+# Rate limiting / backoff
+
+## Use case
+
+Respect API rate limits by detecting 429 responses and backing off before retrying.
+
+## Interceptor recipe
+
+```ts
+import { createClient, isHttpError } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+http.interceptors.response.use(undefined, async (err) => {
+  if (!isHttpError(err) || err.status !== 429) throw err
+
+  const retryAfter = err.response?.headers.get('retry-after')
+  const delay = retryAfter
+    ? parseInt(retryAfter, 10) * 1000
+    : 5000 // fallback: 5 seconds
+
+  if (Number.isNaN(delay) || delay > 60000) throw err // don't wait more than 60s
+
+  await new Promise((resolve) => setTimeout(resolve, delay))
+  return http.request(err.config)
+})
+```
+
+## Notes
+
+- The `Retry-After` header may be in seconds or a date string. This example handles the seconds case.
+- Set an upper bound on the retry delay to avoid hanging indefinitely.
+- Combine with the [retries with backoff](/docs/guides/retries-with-backoff) pattern for comprehensive retry logic.
+- A dedicated `@postalservice/retry` package is planned for the future.

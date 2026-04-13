@@ -1,0 +1,102 @@
+---
+sidebar_position: 21
+title: React usage
+---
+
+# React usage
+
+## Use case
+
+Use postalservice in a React application, including custom hooks and integration with TanStack Query or SWR.
+
+## Custom hook
+
+```tsx
+import { useState, useEffect } from 'react'
+import { createClient, isHttpError } from 'postalservice'
+import type { HttpResponse } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+function useHttp<T>(url: string) {
+  const [data, setData] = useState<T | null>(null)
+  const [error, setError] = useState<Error | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const controller = new AbortController()
+    setLoading(true)
+
+    http.get<T>(url, { signal: controller.signal })
+      .then((res: HttpResponse<T>) => setData(res.data))
+      .catch((err: unknown) => {
+        if (isHttpError(err) && err.code === 'ERR_ABORTED') return
+        setError(err instanceof Error ? err : new Error(String(err)))
+      })
+      .finally(() => setLoading(false))
+
+    return () => controller.abort()
+  }, [url])
+
+  return { data, error, loading }
+}
+```
+
+Usage:
+
+```tsx
+function UserProfile() {
+  const { data, error, loading } = useHttp<{ name: string }>('/users/me')
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>Error: {error.message}</div>
+  return <div>{data?.name}</div>
+}
+```
+
+## TanStack Query integration
+
+```tsx
+import { useQuery } from '@tanstack/react-query'
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+function useUser(id: string) {
+  return useQuery({
+    queryKey: ['user', id],
+    queryFn: async ({ signal }) => {
+      const { data } = await http.get(`/users/${id}`, { signal })
+      return data
+    },
+  })
+}
+```
+
+## SWR integration
+
+```tsx
+import useSWR from 'swr'
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const fetcher = (url: string) => http.get(url).then((res) => res.data)
+
+function UserProfile() {
+  const { data, error } = useSWR('/users/me', fetcher)
+  if (error) return <div>Error</div>
+  if (!data) return <div>Loading...</div>
+  return <div>{data.name}</div>
+}
+```
+
+## Axios equivalent
+
+The patterns are the same. Replace `axios.get` with `http.get` and use `res.data` just like axios.
+
+## Notes and gotchas
+
+- Always cancel requests on unmount using `AbortController` to prevent state updates on unmounted components.
+- A dedicated `@postalservice/react` package with `useHttp()` hooks is planned for the future.
+- postalservice's `signal` option integrates naturally with TanStack Query's `signal` parameter.

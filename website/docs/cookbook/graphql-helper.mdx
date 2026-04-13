@@ -1,0 +1,60 @@
+---
+sidebar_position: 4
+title: GraphQL helper
+---
+
+# GraphQL POST helper
+
+## Use case
+
+Make GraphQL queries and mutations using postalservice.
+
+## Helper function
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({
+  baseURL: 'https://api.example.com',
+  headers: { 'Content-Type': 'application/json' },
+})
+
+interface GraphQLResponse<T> {
+  data: T
+  errors?: Array<{ message: string; path?: string[] }>
+}
+
+async function graphql<T>(
+  query: string,
+  variables?: Record<string, unknown>,
+): Promise<T> {
+  const { data } = await http.post<GraphQLResponse<T>>('/graphql', {
+    query,
+    variables,
+  })
+
+  if (data.errors?.length) {
+    throw new Error(data.errors.map((e) => e.message).join(', '))
+  }
+
+  return data.data
+}
+
+// Usage:
+interface User {
+  id: string
+  name: string
+}
+
+const user = await graphql<User>(
+  `query GetUser($id: ID!) { user(id: $id) { id name } }`,
+  { id: '123' },
+)
+```
+
+## Notes
+
+- GraphQL uses POST with a JSON body containing `query` and `variables`.
+- Error handling for GraphQL is application-level (the HTTP status is usually 200 even for errors).
+- Consider adding the `validate` option with a Zod schema for the GraphQL response shape.
+- For subscriptions, you would need a WebSocket client -- postalservice is HTTP-only.

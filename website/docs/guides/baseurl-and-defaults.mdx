@@ -1,0 +1,71 @@
+---
+sidebar_position: 1
+title: baseURL and defaults
+---
+
+# baseURL and default headers
+
+## Use case
+
+Set a base URL and default headers once, then make all requests relative to that base.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({
+  baseURL: 'https://api.example.com/v1',
+  headers: {
+    Accept: 'application/json',
+    'X-App-Version': '1.0.0',
+  },
+  timeout: 10000,
+})
+
+// Resolves to https://api.example.com/v1/users
+const { data } = await http.get('/users')
+```
+
+## Axios equivalent
+
+In axios you would write:
+
+```ts
+import axios from 'axios'
+
+const http = axios.create({
+  baseURL: 'https://api.example.com/v1',
+  headers: { Accept: 'application/json', 'X-App-Version': '1.0.0' },
+  timeout: 10000,
+})
+
+const { data } = await http.get('/users')
+```
+
+The postalservice API is identical for this pattern.
+
+## Overriding defaults per request
+
+Per-request options merge with (and override) the client defaults:
+
+```ts
+// Override timeout for this one call
+const { data } = await http.get('/slow-endpoint', { timeout: 30000 })
+
+// Add a one-off header
+const { data: d2 } = await http.post('/admin', { action: 'reset' }, {
+  headers: { 'X-Admin-Token': 'secret' },
+})
+```
+
+## Notes and gotchas
+
+- `baseURL` accepts `string | URL`.
+- When `baseURL` is set, **absolute URLs in the `url` field are rejected by default** (`allowAbsoluteUrls` defaults to `false`). This prevents SSRF attacks where a malicious input overrides the intended host. Set `allowAbsoluteUrls: true` if you need to opt out.
+- Default headers are merged, not replaced. Per-request headers take priority.
+- Defaults are accessible and mutable via `http.defaults`:
+
+```ts
+http.defaults.headers = { ...http.defaults.headers, 'X-New': 'value' }
+```

@@ -1,0 +1,90 @@
+---
+sidebar_position: 2
+title: Request bodies
+---
+
+# JSON, FormData, URL-encoded, and binary bodies
+
+## Use case
+
+Send different body types: JSON objects, FormData for file uploads, URL-encoded data for legacy APIs, or raw binary data.
+
+## JSON (default)
+
+Plain objects are automatically serialised to JSON with `Content-Type: application/json`:
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+await http.post('/users', { name: 'Mickey', role: 'admin' })
+```
+
+## FormData
+
+Pass a `FormData` instance directly. The `Content-Type` (including boundary) is set automatically:
+
+```ts
+const form = new FormData()
+form.set('name', 'Mickey')
+form.set('avatar', fileBlob, 'avatar.png')
+
+await http.post('/profile', form)
+```
+
+## Auto-FormData from plain objects
+
+When a plain object contains any `File` or `Blob` value, postalservice automatically converts it to `FormData`:
+
+```ts
+await http.post('/profile', {
+  avatar: fileBlob,    // File or Blob triggers auto-conversion
+  name: 'Mickey',
+  tags: ['admin', 'staff'],
+}, {
+  formDataSerializer: 'brackets', // 'brackets' (default) | 'indices' | 'repeat'
+})
+```
+
+## URL-encoded
+
+Pass a `URLSearchParams` instance:
+
+```ts
+const body = new URLSearchParams({ grant_type: 'client_credentials', client_id: 'abc' })
+await http.post('/oauth/token', body)
+```
+
+Alternatively, set the header explicitly and pass a string:
+
+```ts
+await http.post('/legacy', 'key=value&other=123', {
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+})
+```
+
+## Binary body
+
+`Blob`, `File`, `ArrayBuffer`, and `ReadableStream` are passed through as-is:
+
+```ts
+const blob = new Blob(['hello'], { type: 'text/plain' })
+await http.post('/upload', blob)
+```
+
+## Axios equivalent
+
+In axios, the body parameter is called `data` in the config. In postalservice, it is `body` in the config, but method helpers (`.post()`, `.put()`, `.patch()`) accept it as the second positional argument just like axios:
+
+```ts
+// Both work the same way positionally:
+// axios:          http.post('/url', bodyData, config)
+// postalservice:  http.post('/url', bodyData, config)
+```
+
+## Notes and gotchas
+
+- Auto-FormData triggers only when the body is a **plain object** (prototype is `Object.prototype` or `null`) and contains at least one `File` or `Blob`. Class instances and `URLSearchParams` are not converted.
+- If you manually set `Content-Type`, postalservice respects it and skips auto-detection.
+- The `formDataSerializer` option controls how arrays and nested objects are encoded: `'brackets'` produces `tags[]=admin&tags[]=staff`, `'indices'` produces `tags[0]=admin&tags[1]=staff`, `'repeat'` produces `tags=admin&tags=staff`.

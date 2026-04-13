@@ -1,0 +1,112 @@
+---
+sidebar_position: 8
+title: Validator
+---
+
+# Validator\<T\>
+
+The type accepted by `RequestConfig.validate` for runtime response validation.
+
+```ts
+type Validator<T> =
+  | ((input: unknown) => T)
+  | { parse(input: unknown): T }
+  | StandardSchemaV1<unknown, T>
+```
+
+## Accepted shapes
+
+postalservice checks the validator in this order at runtime:
+
+| Shape | Detection | Examples |
+|---|---|---|
+| Standard Schema v1 | Has a `~standard` property | Zod 3.24+, Valibot 1+, ArkType 2+, Effect-Schema |
+| `.parse()` object | Has a `parse` method | Zod (all versions), custom adapters |
+| Plain function | Is callable | `(input: unknown) => T` |
+
+## StandardSchemaV1
+
+postalservice includes a type-only definition of the Standard Schema v1 interface. No runtime dependency is needed.
+
+```ts
+interface StandardSchemaV1<Input = unknown, Output = Input> {
+  readonly '~standard': {
+    readonly version: 1
+    readonly vendor: string
+    readonly validate: (
+      value: unknown,
+    ) => StandardSchemaV1.Result<Output> | Promise<StandardSchemaV1.Result<Output>>
+    readonly types?: {
+      readonly input: Input
+      readonly output: Output
+    }
+  }
+}
+```
+
+### Sub-types
+
+The `StandardSchemaV1` namespace includes these supporting types:
+
+```ts
+namespace StandardSchemaV1 {
+  type Result<Output> = SuccessResult<Output> | FailureResult
+
+  interface SuccessResult<Output> {
+    readonly value: Output
+    readonly issues?: undefined
+  }
+
+  interface FailureResult {
+    readonly issues: ReadonlyArray<Issue>
+  }
+
+  interface Issue {
+    readonly message: string
+    readonly path?: ReadonlyArray<PropertyKey | PathSegment>
+  }
+
+  interface PathSegment {
+    readonly key: PropertyKey
+  }
+}
+```
+
+## Error behaviour
+
+When validation fails, postalservice throws `HttpError` with:
+- `code: 'ERR_VALIDATION'`
+- `response`: the original `HttpResponse` envelope
+- `cause`: the error thrown by the validator
+
+## Example
+
+```ts
+import { createClient } from 'postalservice'
+import { z } from 'zod'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+// Standard Schema (Zod 3.24+)
+const User = z.object({ id: z.string(), name: z.string() })
+await http.get('/users/me', { validate: User })
+
+// .parse() object
+await http.get('/users/me', { validate: { parse: (d) => d as { id: string } } })
+
+// Plain function
+await http.get('/users/me', {
+  validate: (d: unknown) => {
+    if (typeof d === 'object' && d !== null && 'id' in d) return d as { id: string }
+    throw new Error('Invalid')
+  },
+})
+```
+
+## See also
+
+- [Validation with Zod](/docs/guides/validation-zod)
+- [Validation with Valibot](/docs/guides/validation-valibot)
+- [Validation with ArkType](/docs/guides/validation-arktype)
+- [Validation with a function](/docs/guides/validation-function)
+- [`RequestConfig`](/docs/reference/request-config)

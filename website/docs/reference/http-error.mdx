@@ -1,0 +1,133 @@
+---
+sidebar_position: 5
+title: HttpError
+---
+
+# HttpError
+
+An error class thrown for all request failures. Extends `Error`.
+
+```ts
+import { HttpError, isHttpError } from 'postalservice'
+```
+
+## Class definition
+
+```ts
+class HttpError extends Error {
+  readonly code: HttpErrorCode
+  readonly status: number | undefined
+  readonly config: RequestConfig
+  readonly response: HttpResponse<unknown> | undefined
+  readonly cause: unknown
+}
+```
+
+## Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `code` | `HttpErrorCode` | Machine-readable error code. See table below. |
+| `status` | `number \| undefined` | HTTP status code, if a response was received. |
+| `config` | `RequestConfig` | The merged request config with sensitive headers redacted. |
+| `response` | `HttpResponse<unknown> \| undefined` | The response envelope, if a response was received. |
+| `cause` | `unknown` | The underlying error (e.g., `TypeError` from fetch, `SyntaxError` from JSON parse, validation error). |
+
+## Error codes
+
+| Code | When thrown |
+|---|---|
+| `ERR_HTTP_STATUS` | Non-2xx response (status code outside 200--299). |
+| `ERR_NETWORK` | Network-level failure: DNS error, connection refused, TLS error, stream error. |
+| `ERR_TIMEOUT` | The request timeout elapsed. |
+| `ERR_ABORTED` | The user's `AbortSignal` was triggered. |
+| `ERR_TOO_MANY_REDIRECTS` | Redirect count exceeded `maxRedirects`. |
+| `ERR_DISALLOWED_PROTOCOL` | URL scheme not in `allowedProtocols`. |
+| `ERR_DISALLOWED_HEADER` | Header name not in `allowedRequestHeaders` (when set). |
+| `ERR_ABSOLUTE_URL` | Absolute URL used when `baseURL` is set and `allowAbsoluteUrls` is `false`. |
+| `ERR_PARSE` | Response body could not be parsed (e.g., invalid JSON). |
+| `ERR_VALIDATION` | The `validate` function/schema rejected the response body. |
+| `ERR_CRLF_INJECTION` | A header name or value contains CRLF characters. |
+
+## `isHttpError` type guard
+
+```ts
+function isHttpError(value: unknown): value is HttpError
+```
+
+Returns `true` if the value is an instance of `HttpError`.
+
+## Example
+
+```ts
+import { createClient, isHttpError } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+try {
+  await http.get('/users/999')
+} catch (err) {
+  if (isHttpError(err)) {
+    switch (err.code) {
+      case 'ERR_HTTP_STATUS':
+        console.log(`HTTP ${err.status}: ${err.response?.data}`)
+        break
+      case 'ERR_TIMEOUT':
+        console.log('Request timed out')
+        break
+      case 'ERR_NETWORK':
+        console.log('Network error:', err.cause)
+        break
+      case 'ERR_VALIDATION':
+        console.log('Response validation failed:', err.cause)
+        break
+      default:
+        console.log(`Error: ${err.code}`)
+    }
+  }
+}
+```
+
+## HttpErrorCode type
+
+```ts
+type HttpErrorCode =
+  | 'ERR_HTTP_STATUS'
+  | 'ERR_NETWORK'
+  | 'ERR_TIMEOUT'
+  | 'ERR_ABORTED'
+  | 'ERR_TOO_MANY_REDIRECTS'
+  | 'ERR_DISALLOWED_PROTOCOL'
+  | 'ERR_DISALLOWED_HEADER'
+  | 'ERR_ABSOLUTE_URL'
+  | 'ERR_PARSE'
+  | 'ERR_VALIDATION'
+  | 'ERR_CRLF_INJECTION'
+```
+
+## HttpErrorOptions
+
+The constructor options for `HttpError`:
+
+```ts
+interface HttpErrorOptions {
+  code: HttpErrorCode
+  status?: number
+  config: RequestConfig
+  response?: HttpResponse<unknown>
+  cause?: unknown
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `code` | `HttpErrorCode` | The error code. |
+| `status` | `number \| undefined` | HTTP status code, if applicable. |
+| `config` | `RequestConfig` | The request config (will be redacted). |
+| `response` | `HttpResponse<unknown> \| undefined` | The response envelope, if received. |
+| `cause` | `unknown` | The underlying cause. |
+
+## See also
+
+- [`HttpResponse`](/docs/reference/http-response)
+- [`RequestConfig`](/docs/reference/request-config)

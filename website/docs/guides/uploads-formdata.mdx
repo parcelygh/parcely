@@ -1,0 +1,70 @@
+---
+sidebar_position: 12
+title: Uploads (FormData)
+---
+
+# File uploads with FormData
+
+## Use case
+
+Upload files to a server using multipart form data.
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const form = new FormData()
+form.set('avatar', fileBlob, 'avatar.png')
+form.set('caption', 'Profile photo')
+
+await http.post('/upload', form)
+```
+
+## Auto-conversion from plain objects
+
+When a plain object contains `File` or `Blob` values, postalservice automatically converts it to `FormData`:
+
+```ts
+await http.post('/upload', {
+  avatar: fileBlob,         // File or Blob triggers auto-conversion
+  caption: 'Profile photo',
+  tags: ['profile', 'v2'],  // Arrays are serialised per formDataSerializer
+  metadata: { width: 200, height: 200 }, // Nested objects use bracket notation
+}, {
+  formDataSerializer: 'brackets', // default
+})
+```
+
+### Serialisation modes
+
+| Mode | Array result | Nested object result |
+|---|---|---|
+| `'brackets'` (default) | `tags[]=profile&tags[]=v2` | `metadata[width]=200` |
+| `'indices'` | `tags[0]=profile&tags[1]=v2` | `metadata[width]=200` |
+| `'repeat'` | `tags=profile&tags=v2` | `metadata[width]=200` |
+
+## Axios equivalent
+
+```ts
+// axios:
+const form = new FormData()
+form.append('avatar', file)
+await http.post('/upload', form)
+
+// postalservice (identical pattern):
+const form2 = new FormData()
+form2.set('avatar', file)
+await http.post('/upload', form2)
+```
+
+Axios auto-converts plain objects with File/Blob to FormData via `formSerializer`. postalservice uses `formDataSerializer` with the same default (`'brackets'`).
+
+## Notes and gotchas
+
+- Auto-FormData triggers only when the body is a **plain object** (prototype is `Object.prototype` or `null`) with at least one `File` or `Blob` value.
+- `FormData` instances are passed through without modification.
+- `Content-Type` (with multipart boundary) is set automatically. Do not set it manually.
+- If you manually set `Content-Type`, postalservice respects it and skips auto-conversion.

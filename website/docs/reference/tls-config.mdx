@@ -1,0 +1,60 @@
+---
+sidebar_position: 7
+title: TlsConfig
+---
+
+# TlsConfig
+
+Node-only TLS configuration for custom certificate handling.
+
+```ts
+interface TlsConfig {
+  rejectUnauthorized?: boolean
+  ca?: string | string[]
+}
+```
+
+## Fields
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `rejectUnauthorized` | `boolean` | `true` | Whether to reject connections with unverified certificates. Set to `false` for self-signed certs (development only). |
+| `ca` | `string \| string[]` | `undefined` | PEM-encoded CA certificate(s) to trust. Use for internal/private CAs. |
+
+## How it works
+
+When `tls` is set in `RequestConfig`, postalservice lazy-imports `undici` (built into Node 20+) and creates a custom `Agent` with the specified TLS options. This agent is passed to `fetch` as a dispatcher.
+
+## Example
+
+```ts
+import { createClient } from 'postalservice'
+import { readFileSync } from 'node:fs'
+
+// Self-signed cert (dev only)
+const dev = createClient({
+  baseURL: 'https://localhost:3443',
+  tls: { rejectUnauthorized: false },
+})
+
+// Custom CA
+const internal = createClient({
+  baseURL: 'https://api.internal.corp',
+  tls: { ca: readFileSync('/etc/ssl/internal-ca.pem', 'utf-8') },
+})
+```
+
+## Platform behaviour
+
+| Runtime | Behaviour |
+|---|---|
+| Node 20+ | Full support via `undici.Agent` |
+| Browsers | Ignored; one-shot `console.warn` |
+| Bun | Ignored; one-shot `console.warn` |
+| Deno | Ignored; one-shot `console.warn` |
+
+## See also
+
+- [TLS: self-signed certs](/docs/guides/tls-self-signed)
+- [TLS: custom CA](/docs/guides/tls-custom-ca)
+- [`RequestConfig`](/docs/reference/request-config)

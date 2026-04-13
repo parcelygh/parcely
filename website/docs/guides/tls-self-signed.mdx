@@ -1,0 +1,54 @@
+---
+sidebar_position: 22
+title: "TLS: self-signed certs"
+---
+
+# TLS: self-signed certificates
+
+## Use case
+
+Connect to a server with a self-signed TLS certificate in development or testing environments (Node.js only).
+
+## Smallest working example
+
+```ts
+import { createClient } from 'postalservice'
+
+const http = createClient({
+  baseURL: 'https://localhost:3443',
+  tls: {
+    rejectUnauthorized: false,
+  },
+})
+
+const { data } = await http.get('/health')
+```
+
+## How it works
+
+When `tls` is set, postalservice lazy-imports `undici` (built into Node 20+) and creates a custom `Agent` with the specified TLS options. This is passed to `fetch` as a dispatcher.
+
+## Axios equivalent
+
+```ts
+// axios (Node):
+import https from 'https'
+
+const http = axios.create({
+  baseURL: 'https://localhost:3443',
+  httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+})
+
+// postalservice:
+const http2 = createClient({
+  baseURL: 'https://localhost:3443',
+  tls: { rejectUnauthorized: false },
+})
+```
+
+## Notes and gotchas
+
+- **Node-only.** In browsers, Bun, and Deno, the `tls` option is ignored and a one-shot `console.warn` is emitted.
+- `rejectUnauthorized: false` emits a one-shot `console.warn` to remind you not to use it in production.
+- For production with internal CAs, use the `ca` option instead. See [TLS: custom CA](/docs/guides/tls-custom-ca).
+- The `TlsConfig` type is `{ rejectUnauthorized?: boolean; ca?: string | string[] }`.

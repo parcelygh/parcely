@@ -1,0 +1,30 @@
+---
+sidebar_position: 6
+title: Content-type-aware parsing
+---
+
+# Content-type-aware JSON parsing
+
+## The threat
+
+When an HTTP client blindly calls `JSON.parse()` on every response body, non-JSON responses (HTML error pages, plain text, XML) cause a `SyntaxError`. In axios, this could lead to uncatchable errors or confusing stack traces.
+
+## How postalservice prevents it
+
+postalservice checks the response `Content-Type` header before attempting JSON parsing. When `responseType` is `'json'` (the default):
+
+1. If the `Content-Type` indicates JSON (e.g., `application/json`, `text/json`, `application/vnd.api+json`), the body is parsed as JSON.
+2. If the `Content-Type` does not indicate JSON, the body is returned as raw text.
+3. If JSON parsing fails even with a JSON content type, postalservice throws `HttpError` with `code: 'ERR_PARSE'` and the original `SyntaxError` as `cause`.
+
+## Security table reference
+
+This corresponds to row 8 in the [security defaults table](/docs/security/threat-model):
+
+| # | Defense | Default |
+|---|---|---|
+| 8 | Content-type-aware JSON parsing | Always on |
+
+## Always on
+
+This behaviour is always active when `responseType` is `'json'`. For other response types (`'text'`, `'arraybuffer'`, `'blob'`), the body is parsed according to the requested type without content-type sniffing.

@@ -1,0 +1,38 @@
+---
+sidebar_position: 7
+title: Timeout and abort cleanup
+---
+
+# Timeout / abort cleanup
+
+## The threat
+
+Leaked timers and unconsumed response bodies can cause resource leaks, especially in long-running server processes. If a timeout fires after a response has already been handled, it can abort unrelated requests or leave dangling references.
+
+## How postalservice prevents it
+
+postalservice combines timeout and user signals via `AbortSignal.any([userSignal, AbortSignal.timeout(ms)])`. The request lifecycle uses a `finally` block to:
+
+1. Clear any pending timers.
+2. Ensure the response body is consumed or discarded (no dangling `ReadableStream`).
+3. Clean up progress-tracking wrappers.
+
+## Error codes
+
+| Scenario | Error code |
+|---|---|
+| Timeout fires | `ERR_TIMEOUT` |
+| User signal aborts | `ERR_ABORTED` |
+| Stream error during upload/download | `ERR_NETWORK` |
+
+## Security table reference
+
+This corresponds to row 9 in the [security defaults table](/docs/security/threat-model):
+
+| # | Defense | Default |
+|---|---|---|
+| 9 | Timeout + user signal combined via `AbortSignal.any`; timers cleared in `finally` | Always on |
+
+## Always on
+
+This cleanup behaviour is always active. There is no way to disable it.
