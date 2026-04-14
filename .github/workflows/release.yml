@@ -76,5 +76,4 @@ jobs:
           # Both vars must be set so the token flows to both pnpm and npm.
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          # Provenance disabled until token-based publish is confirmed
-          # working. Re-enable with: NPM_CONFIG_PROVENANCE: "true"
+          NPM_CONFIG_PROVENANCE: "true"
