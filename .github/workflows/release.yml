@@ -72,10 +72,11 @@ jobs:
           createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          # Activate npm provenance attestations. Combined with the
-          # `id-token: write` permission above, this attaches a signed
-          # attestation to each published tarball proving it was built
-          # by this workflow. Requires npm CLI 9.5+ / pnpm 8+ — we're on
-          # pnpm 10 so this just works.
+          # No NPM_TOKEN — trusted publishing is configured for all
+          # @parcely packages. The OIDC token from GitHub Actions (via
+          # the `id-token: write` permission above) authenticates with
+          # npm directly. If you ever need to fall back to token auth,
+          # add `NPM_TOKEN: ${{ secrets.NPM_TOKEN }}` here.
+          #
+          # Provenance attestations are also powered by the OIDC token:
           NPM_CONFIG_PROVENANCE: "true"
