@@ -4,6 +4,7 @@
     { "path": "packages/parcely" },
     { "path": "packages/auth-token" },
     { "path": "packages/auth-redirect" },
-    { "path": "packages/retry" }
+    { "path": "packages/retry" },
+    { "path": "packages/react" }
   ]
 }
