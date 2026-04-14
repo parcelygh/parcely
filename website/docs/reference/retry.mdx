@@ -1,0 +1,106 @@
+---
+sidebar_position: 11
+title: "@parcely/retry"
+---
+
+# @parcely/retry
+
+Automatic retries with exponential backoff, `Retry-After` honoring, and `AbortSignal`-aware backoff sleep. Idempotent methods by default.
+
+```ts
+import { createRetry } from '@parcely/retry'
+```
+
+## `createRetry(opts?: RetryOptions): RetryHandle`
+
+Factory that returns an interceptor pair and an `install(client)` convenience.
+
+```ts
+import { createClient } from 'parcely'
+import { createRetry } from '@parcely/retry'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+const retry = createRetry({ count: 3 })
+retry.install(http)
+```
+
+## Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `count` | `number` | `3` | Maximum retry attempts, not including the initial request. |
+| `methods` | `string[]` | `['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE']` | HTTP methods eligible for automatic retry. Case-insensitive. POST / PATCH excluded by default because replaying a side-effectful request can cause duplicates — opt in explicitly if your POST is idempotent. |
+| `retryOn` | `(err) => boolean` | See defaults below | Predicate deciding whether a given failure is retryable. |
+| `delay` | `number \| (attempt, err) => number` | full-jitter exp backoff | Delay between attempts. Number for fixed, function for custom. |
+| `baseDelayMs` | `number` | `300` | Base for exponential backoff when `delay` is not a function. |
+| `maxDelayMs` | `number` | `30_000` | Upper bound on any single delay, including `Retry-After`-derived delays. Prevents a hostile `Retry-After: 999999` from DoSing the client. |
+| `retryAfter` | `boolean` | `true` | When `true`, honor the server's `Retry-After` header on 429 / 503. Parses integer seconds and HTTP-date. |
+| `onRetry` | `(ctx) => void \| Promise<void>` | — | Hook fired before each retry. `ctx` is `{ attempt, error, delayMs }`. Throwing from this hook aborts the retry loop and rethrows the original error. |
+
+### Default retry predicate
+
+Retries on:
+- `code === 'ERR_NETWORK'`
+- `code === 'ERR_TIMEOUT'`
+- `code === 'ERR_HTTP_STATUS'` AND `status` in `[408, 429, 500, 502, 503, 504]`
+
+Does **not** retry on:
+- `ERR_ABORTED` — user-initiated cancel
+- `ERR_VALIDATION` — bad response payload; retrying won't help
+- `ERR_ABSOLUTE_URL`, `ERR_DISALLOWED_PROTOCOL`, `ERR_DISALLOWED_HEADER`, `ERR_CRLF_INJECTION` — security errors
+- `ERR_TOO_MANY_REDIRECTS` — redirect loop
+
+## `RetryHandle`
+
+```ts
+interface RetryHandle {
+  response: { rejected: InterceptorHandler<HttpResponse<unknown>>['rejected'] }
+  install(client: Client): void
+}
+```
+
+`install(client)` wires the response error interceptor. You can also attach manually via `client.interceptors.response.use(undefined, retry.response.rejected)` if you need finer-grained control.
+
+## AbortSignal integration
+
+The backoff sleep is `AbortSignal`-aware. If `config.signal` aborts during a backoff delay, the retry is NOT fired — the abort propagates and the final error is `HttpError { code: 'ERR_ABORTED' }`, not the last transient failure.
+
+```ts
+const controller = new AbortController()
+setTimeout(() => controller.abort(), 1000)
+
+await http.get('/slow', { signal: controller.signal })
+// Even if the server is 503ing on every attempt, this rejects with
+// ERR_ABORTED at the 1-second mark — mid-backoff.
+```
+
+## Coexistence with `@parcely/auth-token`
+
+Install `auth-token` first, then `retry`:
+
+```ts
+createAuthToken({ /* ... */ }).install(http)
+createRetry({ /* ... */ }).install(http)
+```
+
+`auth-token` uses a `_retry: true` marker on the config to prevent refresh loops. `@parcely/retry` uses a separate `_retryCount: number` marker. The two don't double-count each other — a refresh-on-401 retry doesn't consume one of your retry attempts, and a backoff retry doesn't trigger a second token refresh.
+
+## `Retry-After` semantics
+
+When `retryAfter: true` (default) and the response is 429 or 503:
+
+- Integer form `Retry-After: 120` → wait 120 seconds (clamped to `maxDelayMs`).
+- HTTP-date form `Retry-After: Wed, 21 Oct 2026 07:28:00 GMT` → wait until that time (clamped).
+- Missing / unparseable header → fall back to computed backoff.
+
+The clamp is the defensive default — a single broken response can't pin your client for hours.
+
+## Error model
+
+`@parcely/retry` doesn't introduce new error codes. If retries are exhausted, the **final** error propagates — its `code`, `status`, and `response` reflect the last attempt, not the first. Use the `onRetry` hook if you need to observe transient failures.
+
+## See also
+
+- [Retries with backoff guide](/docs/guides/retries-with-backoff)
+- [`@parcely/auth-token`](/docs/reference/auth-token) — compose for refresh-then-retry flows
+- [`HttpError`](/docs/reference/http-error) — what the retry predicate receives

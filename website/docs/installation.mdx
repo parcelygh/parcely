@@ -58,6 +58,14 @@ Redirect the browser to a login URL on 401/403.
 npm install @parcely/auth-redirect
 ```
 
+### `@parcely/retry`
+
+Exponential-backoff retries with full jitter, `Retry-After` support, and `AbortSignal`-aware backoff sleep. Idempotent methods by default.
+
+```bash
+npm install @parcely/retry
+```
+
 ## Requirements
 
 - **Node.js** 20+ (uses global `fetch` and `undici` for TLS overrides, installed via `optionalDependencies`)

@@ -5,13 +5,67 @@ title: Retries with backoff
 
 # Retries with exponential backoff
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ## Use case
 
-Retry failed requests (network errors, 5xx responses) with increasing delays between attempts.
+Automatically retry failed requests — network errors, 5xx responses, 429 rate-limit with `Retry-After` — with increasing delays between attempts and jitter to avoid thundering herds.
 
-## Interceptor recipe
+## Recommended: `@parcely/retry`
 
-parcely does not include a built-in retry mechanism in v1 (a `@parcely/retry` package is planned). Here is a response interceptor recipe:
+parcely ships a first-party retry addon. Install it, call `install(client)`, and you're done.
+
+```sh
+npm install @parcely/retry
+```
+
+```ts
+import { createClient } from 'parcely'
+import { createRetry } from '@parcely/retry'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+
+const retry = createRetry({
+  count: 3,                                // default: 3 retries
+  baseDelayMs: 300,                        // full-jitter exp backoff: 0–300, 0–600, 0–1200 …
+  maxDelayMs: 30_000,                      // cap per-attempt delay
+  // methods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE'],  // default — idempotent only
+  retryAfter: true,                        // honor server's Retry-After on 429 / 503
+  onRetry: ({ attempt, error, delayMs }) => {
+    console.warn(`retry ${attempt} in ${delayMs}ms — ${error.code}`)
+  },
+})
+
+retry.install(http)
+```
+
+That's the full integration. The defaults match what most teams want: idempotent methods only, full-jitter exponential backoff, `Retry-After` honored, skip on `ERR_ABORTED` and `ERR_VALIDATION`. See the [`@parcely/retry` reference](/docs/reference/retry) for every option.
+
+### Customising the retry predicate
+
+```ts
+createRetry({
+  retryOn: (err) => {
+    // Only retry on 503 and 504 — not 500 or 502.
+    return err.code === 'ERR_HTTP_STATUS' && [503, 504].includes(err.status ?? 0)
+  },
+})
+```
+
+### Opting in a non-idempotent method
+
+POST and PATCH are NOT retried by default because replaying a side-effectful request can cause duplicates. If your POST is idempotent (e.g. has an `Idempotency-Key` header), opt in explicitly:
+
+```ts
+createRetry({
+  methods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE', 'POST'],
+})
+```
+
+## Alternative: hand-rolled interceptor
+
+If you want zero additional dependencies, the same behaviour is ~15 lines of interceptor:
 
 ```ts
 import { createClient, isHttpError } from 'parcely'
@@ -19,7 +73,7 @@ import { createClient, isHttpError } from 'parcely'
 const http = createClient({ baseURL: 'https://api.example.com' })
 
 const MAX_RETRIES = 3
-const RETRY_DELAY = 1000
+const BASE_DELAY = 300
 
 http.interceptors.response.use(undefined, async (err) => {
   if (!isHttpError(err)) throw err
@@ -32,7 +86,9 @@ http.interceptors.response.use(undefined, async (err) => {
 
   if (!isRetryable || retryCount >= MAX_RETRIES) throw err
 
-  const delay = RETRY_DELAY * Math.pow(2, retryCount)
+  // Full-jitter exponential backoff.
+  const cap = BASE_DELAY * Math.pow(2, retryCount)
+  const delay = Math.floor(Math.random() * cap)
   await new Promise((resolve) => setTimeout(resolve, delay))
 
   const retryConfig = { ...err.config, _retryCount: retryCount + 1 }
@@ -40,13 +96,39 @@ http.interceptors.response.use(undefined, async (err) => {
 })
 ```
 
-## Axios equivalent
+`@parcely/retry` adds on top of this: `AbortSignal`-aware backoff sleep (cancels cleanly if the user aborts mid-retry), `Retry-After` parsing (integer + HTTP-date, clamped), an `onRetry` hook, idempotent-method filtering by default, and coexistence with `@parcely/auth-token`'s refresh-on-401.
 
-The pattern is the same in axios -- a response interceptor with retry logic. Libraries like `axios-retry` wrap this; a similar `@parcely/retry` package is planned.
+## Axios comparison
+
+<Tabs>
+<TabItem value="axios" label="axios">
+
+```ts
+import axios from 'axios'
+import axiosRetry from 'axios-retry'
+
+const http = axios.create({ baseURL: 'https://api.example.com' })
+axiosRetry(http, { retries: 3, retryDelay: axiosRetry.exponentialDelay })
+```
+
+</TabItem>
+<TabItem value="parcely" label="parcely">
+
+```ts
+import { createClient } from 'parcely'
+import { createRetry } from '@parcely/retry'
+
+const http = createClient({ baseURL: 'https://api.example.com' })
+createRetry({ count: 3 }).install(http)
+```
+
+</TabItem>
+</Tabs>
 
 ## Notes and gotchas
 
-- The `_retryCount` field is a convention stored on the config. Since `RequestConfig` uses explicit fields, you may need a type assertion for custom metadata.
-- Be careful with non-idempotent methods (POST, PATCH). Consider retrying only GET, HEAD, OPTIONS, or checking the method in the interceptor.
-- Exponential backoff with jitter (`delay * (0.5 + Math.random() * 0.5)`) is recommended for production use.
-- The built-in `timeout` still applies per attempt. Each retry starts a fresh timeout.
+- Non-idempotent methods (POST, PATCH) aren't retried by default. Replaying a side-effectful request without an idempotency key can cause duplicate charges, double-emails, etc.
+- `Retry-After` is clamped at `maxDelayMs` so a hostile or buggy server (`Retry-After: 999999`) can't stall your client.
+- The built-in `timeout` applies per attempt. Each retry starts a fresh timeout.
+- `@parcely/retry` sets `_retryCount` on the retry config; combined with `@parcely/auth-token`'s `_retry` marker, retry attempts and auth refreshes don't double-count each other.
+- Pair with the [authentication refresh guide](./auth-refresh-on-401.mdx) if you need both retry and token refresh.

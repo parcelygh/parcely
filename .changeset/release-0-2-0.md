@@ -2,7 +2,9 @@
 "parcely": minor
 ---
 
-0.2.0 — fix-it release addressing the v1 code review findings.
+0.2.0 — fix-it release addressing the v1 code review findings, plus `@parcely/retry` as the first deferred addon.
+
+Note on cascaded version bumps: because addons declare `parcely` as a `peerDependency` with a 0.x range, Changesets treats any `parcely` minor bump as breaking for them and escalates their versions. See the per-package notes below — `@parcely/retry` is a brand-new package and publishes at 0.1.0, while the two existing addons get cascaded majors for compatibility signaling.
 
 ### parcely
 
@@ -32,3 +34,18 @@
 ### @parcely/auth-redirect
 
 - No code changes in this release.
+
+### @parcely/retry (new package)
+
+First release. `createRetry(opts)` returns an interceptor pair with an `install(client)` convenience, following the same pattern as the other addons.
+
+**Features**
+- Exponential backoff with full jitter (Amazon-style decorrelation).
+- Configurable `count` (default 3), `baseDelayMs` (300ms), `maxDelayMs` (30s cap).
+- Idempotent methods only by default (`GET`, `HEAD`, `OPTIONS`, `PUT`, `DELETE`). Opt in POST/PATCH explicitly via the `methods` option.
+- Default `retryOn` predicate: `ERR_NETWORK`, `ERR_TIMEOUT`, and `ERR_HTTP_STATUS` with status in `[408, 429, 500, 502, 503, 504]`.
+- `Retry-After` header honored (integer seconds and HTTP-date), clamped at `maxDelayMs`.
+- `AbortSignal`-aware backoff sleep — aborting during a delay cancels the pending retry.
+- `onRetry` hook with `{ attempt, error, delayMs }` context. Throwing from the hook aborts the retry loop.
+- `_retryCount` marker on retry configs. Coexists cleanly with `@parcely/auth-token`'s `_retry` marker — the two don't double-count each other.
+- 33 colocated tests (15 for the backoff/parsing helpers, 18 for end-to-end behaviour).

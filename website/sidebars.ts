@@ -81,6 +81,7 @@ const sidebars: SidebarsConfig = {
         'reference/validator',
         'reference/auth-token',
         'reference/auth-redirect',
+        'reference/retry',
       ],
     },
     'changelog',

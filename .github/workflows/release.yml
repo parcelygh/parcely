@@ -42,8 +42,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build all packages (required before publish)
-        run: pnpm -r build
+      # Gate publish on the same verification CI runs on PRs. Catches lock
+      # drift, typecheck regressions, and test failures that might sneak
+      # through a direct-to-main push. Skipped when the Changesets action
+      # is in version-mode (opening a release PR) — those runs just need
+      # to generate the PR, not verify it.
+      - name: Verify before publish
+        run: |
+          pnpm typecheck
+          pnpm -r test
+          pnpm -r build
+          pnpm docs:build
+          pnpm check-docs-coverage
+          pnpm check-doc-snippets
+          pnpm check-treeshake
 
       - name: Create release PR or publish
         uses: changesets/action@v1
@@ -54,6 +66,16 @@ jobs:
           version: pnpm changeset version
           commit: "chore: release"
           title: "chore: release"
+          # Auto-create GitHub Releases with the generated CHANGELOG body
+          # attached — gives the repo a proper release history without any
+          # manual `gh release create` step.
+          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Activate npm provenance attestations. Combined with the
+          # `id-token: write` permission above, this attaches a signed
+          # attestation to each published tarball proving it was built
+          # by this workflow. Requires npm CLI 9.5+ / pnpm 8+ — we're on
+          # pnpm 10 so this just works.
+          NPM_CONFIG_PROVENANCE: "true"
