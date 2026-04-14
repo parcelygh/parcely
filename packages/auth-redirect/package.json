@@ -1,6 +1,6 @@
 {
   "name": "@parcely/auth-redirect",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Browser-side login-redirect interceptor for parcely. Redirects on 401/403 with optional return_to preservation and cooldown debounce.",
   "license": "MIT",
   "keywords": [

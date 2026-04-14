@@ -1,6 +1,6 @@
 {
   "name": "@parcely/retry",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Exponential-backoff retry interceptor for parcely, with full jitter, Retry-After support, and idempotent-methods-by-default safety.",
   "license": "MIT",
   "keywords": [
