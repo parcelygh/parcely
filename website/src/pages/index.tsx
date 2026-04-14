@@ -41,7 +41,7 @@ const features: { title: string; description: string }[] = [
   },
 ];
 
-const demoCode = `import { createClient } from 'parcely'
+const demoCode = `import { createClient } from '@parcely/core'
 import { z } from 'zod'
 
 const http = createClient({

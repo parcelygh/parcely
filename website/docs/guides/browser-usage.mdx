@@ -12,7 +12,7 @@ Use parcely in a web application (React, Vue, Svelte, vanilla JS, etc.).
 ## Smallest working example
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -50,7 +50,7 @@ import axios from 'axios'
 const http = axios.create({ baseURL: 'https://api.example.com' })
 
 // parcely (same pattern):
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 const http2 = createClient({ baseURL: 'https://api.example.com' })
 ```
 

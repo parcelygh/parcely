@@ -37,10 +37,10 @@
     "test:watch": "vitest"
   },
   "peerDependencies": {
-    "parcely": "workspace:*"
+    "@parcely/core": "workspace:*"
   },
   "devDependencies": {
-    "parcely": "workspace:*",
+    "@parcely/core": "workspace:*",
     "rimraf": "^6.1.3",
     "typescript": "^6.0.2",
     "vitest": "^3.2.1"

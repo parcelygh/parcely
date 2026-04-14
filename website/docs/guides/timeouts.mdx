@@ -12,7 +12,7 @@ Abort requests that take too long, either at the client level or per request.
 ## Smallest working example
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -28,7 +28,7 @@ await http.get('/slow-endpoint', { timeout: 30000 })
 parcely creates an `AbortSignal.timeout(ms)` and combines it with any user-provided `signal` via `AbortSignal.any`. When the timeout fires, the request throws `HttpError` with `code: 'ERR_TIMEOUT'`.
 
 ```ts
-import { isHttpError } from 'parcely'
+import { isHttpError } from '@parcely/core'
 
 try {
   await http.get('/slow')

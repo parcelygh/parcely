@@ -21,7 +21,7 @@ npm install @parcely/retry
 ```
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { createRetry } from '@parcely/retry'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
@@ -68,7 +68,7 @@ createRetry({
 If you want zero additional dependencies, the same behaviour is ~15 lines of interceptor:
 
 ```ts
-import { createClient, isHttpError } from 'parcely'
+import { createClient, isHttpError } from '@parcely/core'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -115,7 +115,7 @@ axiosRetry(http, { retries: 3, retryDelay: axiosRetry.exponentialDelay })
 <TabItem value="parcely" label="parcely">
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { createRetry } from '@parcely/retry'
 
 const http = createClient({ baseURL: 'https://api.example.com' })

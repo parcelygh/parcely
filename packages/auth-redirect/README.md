@@ -7,7 +7,7 @@ npm install parcely @parcely/auth-redirect
 ```
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { createAuthRedirect } from '@parcely/auth-redirect'
 
 const http = createClient({ baseURL: 'https://api.example.com' })

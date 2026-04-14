@@ -7,7 +7,7 @@ npm install parcely @parcely/auth-token
 ```
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { createAuthToken } from '@parcely/auth-token'
 
 const http = createClient({ baseURL: 'https://api.example.com' })

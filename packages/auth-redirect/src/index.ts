@@ -6,8 +6,8 @@ import type {
   Client,
   HttpResponse,
   InterceptorHandler,
-} from 'parcely';
-import { HttpError } from 'parcely';
+} from '@parcely/core';
+import { HttpError } from '@parcely/core';
 
 // ---- Public option types ---------------------------------------------------
 
@@ -101,7 +101,7 @@ export interface AuthRedirectHandle {
  *
  * @example
  * ```ts
- * import { createClient } from 'parcely'
+ * import { createClient } from '@parcely/core'
  * import { createAuthRedirect } from '\@parcely/auth-redirect'
  *
  * const http = createClient({ baseURL: 'https://api.example.com' })

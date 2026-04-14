@@ -24,7 +24,7 @@ body:
       description: A minimal snippet or a link to a repository / codesandbox. Please strip external dependencies and irrelevant code.
       render: ts
       placeholder: |
-        import { createClient } from 'parcely'
+        import { createClient } from '@parcely/core'
         const http = createClient({ baseURL: 'https://example.com' })
         // ...
     validations:

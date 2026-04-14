@@ -20,7 +20,7 @@ title: Introduction
 ## What it looks like
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({
   baseURL: 'https://api.example.com',

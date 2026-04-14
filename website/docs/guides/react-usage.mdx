@@ -13,8 +13,8 @@ Use parcely in a React application, including custom hooks and integration with 
 
 ```tsx
 import { useState, useEffect } from 'react'
-import { createClient, isHttpError } from 'parcely'
-import type { HttpResponse } from 'parcely'
+import { createClient, isHttpError } from '@parcely/core'
+import type { HttpResponse } from '@parcely/core'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -58,7 +58,7 @@ function UserProfile() {
 
 ```tsx
 import { useQuery } from '@tanstack/react-query'
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -77,7 +77,7 @@ function useUser(id: string) {
 
 ```tsx
 import useSWR from 'swr'
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 

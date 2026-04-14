@@ -77,7 +77,7 @@ namespace StandardSchemaV1 {
 Conditional helper type that extracts the parsed-output type from any validator shape. The `Client` method overloads use this internally so calls like `http.get('/u', { validate: schema })` infer `data` from the schema with no explicit `<T>`. You can also use it directly when wrapping parcely:
 
 ```ts
-import type { ValidatorOutput, Validator } from 'parcely'
+import type { ValidatorOutput, Validator } from '@parcely/core'
 
 type FromZod   = ValidatorOutput<typeof UserSchema>          // z.infer<typeof UserSchema>
 type FromParse = ValidatorOutput<{ parse(i: unknown): User }> // User
@@ -102,7 +102,7 @@ When validation fails, parcely throws `HttpError` with:
 ## Example
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { z } from 'zod'
 
 const http = createClient({ baseURL: 'https://api.example.com' })

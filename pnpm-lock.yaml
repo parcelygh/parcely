@@ -26,7 +26,7 @@ importers:
 
   packages/auth-redirect:
     devDependencies:
-      parcely:
+      '@parcely/core':
         specifier: workspace:*
         version: link:../parcely
       rimraf:
@@ -41,7 +41,7 @@ importers:
 
   packages/auth-token:
     devDependencies:
-      parcely:
+      '@parcely/core':
         specifier: workspace:*
         version: link:../parcely
       rimraf:
@@ -78,7 +78,7 @@ importers:
       '@parcely/auth-token':
         specifier: workspace:*
         version: link:../auth-token
-      parcely:
+      '@parcely/core':
         specifier: workspace:*
         version: link:../parcely
       rimraf:

@@ -7,7 +7,7 @@ npm install parcely @parcely/retry
 ```
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { createRetry } from '@parcely/retry'
 
 const http = createClient({ baseURL: 'https://api.example.com' })

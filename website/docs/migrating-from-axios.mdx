@@ -97,7 +97,7 @@ const http = axios.create({
 <TabItem value="parcely" label="parcely">
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -215,7 +215,7 @@ try {
 <TabItem value="parcely" label="parcely">
 
 ```ts
-import { isHttpError } from 'parcely'
+import { isHttpError } from '@parcely/core'
 
 try {
   await http.get('/fail')
@@ -424,7 +424,7 @@ parcely supports `'json'` (default), `'text'`, `'arraybuffer'`, and `'blob'`. Th
 parcely adds a `validate` option with no axios equivalent:
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { z } from 'zod'
 
 const http = createClient({ baseURL: 'https://api.example.com' })

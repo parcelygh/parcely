@@ -27,7 +27,7 @@ let match: RegExpExecArray | null;
 while ((match = codeBlockRegex.exec(content)) !== null) {
   const code = match[1]!;
   // We only type-check blocks that import from parcely
-  if (code.includes("from 'parcely'")) {
+  if (code.includes("from '@parcely/core'")) {
     blocks.push(code);
   }
 }
@@ -45,7 +45,7 @@ const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ps-doc-snippets-'));
 // Create a parcely declaration file that matches the public API.
 // We derive this from the actual source types so it stays in sync.
 const parcelyDts = `
-declare module 'parcely' {
+declare module '@parcely/core' {
   export interface TlsConfig {
     rejectUnauthorized?: boolean;
     ca?: string | string[];
@@ -174,7 +174,7 @@ declare const fileBlob: Blob;
 declare const largeFile: File;
 declare const arrayBuffer: ArrayBuffer;
 declare const someReadableStream: ReadableStream;
-declare const http: import('parcely').Client;
+declare const http: import('@parcely/core').Client;
 declare const form: FormData;
 `;
 
@@ -195,8 +195,8 @@ const snippetBodies = blocks.map((block, i) => {
   const zodBindings: string[] = [];
 
   for (const line of importLines) {
-    // Match: import { foo, bar } from 'parcely'
-    const namedMatch = line.match(/import\s+\{([^}]+)\}\s+from\s+'parcely'/);
+    // Match: import { foo, bar } from '@parcely/core'
+    const namedMatch = line.match(/import\s+\{([^}]+)\}\s+from\s+'@parcely\/core'/);
     if (namedMatch) {
       const names = namedMatch[1]!.split(',').map((n) => n.trim()).filter(Boolean);
       parcelyBindings.push(...names);
@@ -210,7 +210,7 @@ const snippetBodies = blocks.map((block, i) => {
   // Build declarations for the extracted imports
   const declLines: string[] = [];
   for (const name of parcelyBindings) {
-    declLines.push(`  const ${name} = (await import('parcely')).${name};`);
+    declLines.push(`  const ${name} = (await import('@parcely/core')).${name};`);
   }
 
   // For zod, we just declare z as any since we don't have zod types

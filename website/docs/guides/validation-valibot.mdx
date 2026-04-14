@@ -12,7 +12,7 @@ Validate API responses at runtime using Valibot, a lightweight schema library.
 ## Smallest working example
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import * as v from 'valibot'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
@@ -36,7 +36,7 @@ Valibot 1+ implements Standard Schema v1, which parcely accepts natively. No ada
 ## Error handling
 
 ```ts
-import { isHttpError } from 'parcely'
+import { isHttpError } from '@parcely/core'
 
 try {
   await http.get('/users/me', { validate: UserSchema })

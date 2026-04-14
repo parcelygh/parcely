@@ -12,7 +12,7 @@ Respect API rate limits by detecting 429 responses and backing off before retryi
 ## Interceptor recipe
 
 ```ts
-import { createClient, isHttpError } from 'parcely'
+import { createClient, isHttpError } from '@parcely/core'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 

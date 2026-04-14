@@ -12,7 +12,7 @@ Use parcely in a Node.js 20+ application.
 ## Smallest working example
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -59,7 +59,7 @@ const http = axios.create({ baseURL: 'https://api.example.com' })
 const { data } = await http.get('/users')
 
 // parcely (identical pattern):
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 const http2 = createClient({ baseURL: 'https://api.example.com' })
 const { data: d2 } = await http2.get('/users')
 ```

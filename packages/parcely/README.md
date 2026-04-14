@@ -9,7 +9,7 @@ npm install undici
 ```
 
 ```ts
-import { createClient, HttpError } from 'parcely'
+import { createClient, HttpError } from '@parcely/core'
 
 const http = createClient({
   baseURL: 'https://api.example.com',

@@ -7,7 +7,7 @@ import type {
   InterceptorHandler,
   RequestConfig,
   HttpResponse,
-} from 'parcely';
+} from '@parcely/core';
 
 import { createSingleFlight } from './single-flight.js';
 
@@ -140,7 +140,7 @@ function isHttpErrorLike(err: unknown): err is HttpErrorLike {
  * @example
  * ```ts
  * import { createAuthToken } from '@parcely/auth-token';
- * import { createClient } from 'parcely';
+ * import { createClient } from '@parcely/core';
  *
  * const http = createClient({ baseURL: 'https://api.example.com' });
  * const auth = createAuthToken({

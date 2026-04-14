@@ -3,7 +3,7 @@
 A zero-dependency, fetch-based HTTP client with axios-like ergonomics and a secure-by-default posture.
 
 ```ts
-import { createClient, HttpError } from 'parcely'
+import { createClient, HttpError } from '@parcely/core'
 
 const http = createClient({ baseURL: 'https://api.example.com', timeout: 5_000 })
 

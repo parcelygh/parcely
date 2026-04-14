@@ -12,7 +12,7 @@ Attach authentication credentials to every request. You can do this manually wit
 ## Manual header
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -27,7 +27,7 @@ const http = createClient({
 For dynamic tokens (e.g., read from storage on each request):
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -45,7 +45,7 @@ http.interceptors.request.use((config) => ({
 The `@parcely/auth-token` addon provides a higher-level API:
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { createAuthToken } from '@parcely/auth-token'
 
 const http = createClient({ baseURL: 'https://api.example.com' })

@@ -12,7 +12,7 @@ Validate API responses at runtime against a Zod schema, getting both type safety
 ## Smallest working example
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { z } from 'zod'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
@@ -41,7 +41,7 @@ When validation fails, parcely throws `HttpError` with:
 ## Error handling
 
 ```ts
-import { isHttpError } from 'parcely'
+import { isHttpError } from '@parcely/core'
 
 try {
   await http.get('/users/me', { validate: UserSchema })

@@ -12,7 +12,7 @@ When an API returns 401, automatically refresh the access token and retry the or
 ## Using `@parcely/auth-token` (recommended)
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { createAuthToken } from '@parcely/auth-token'
 
 const refreshClient = createClient({ baseURL: 'https://api.example.com' })
@@ -41,7 +41,7 @@ Key behaviour:
 ## Hand-rolled interceptor recipe
 
 ```ts
-import { createClient, isHttpError } from 'parcely'
+import { createClient, isHttpError } from '@parcely/core'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 

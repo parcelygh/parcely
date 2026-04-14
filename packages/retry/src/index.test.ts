@@ -6,7 +6,7 @@ import type {
   RequestConfig,
   HttpResponse,
   InterceptorHandler,
-} from 'parcely';
+} from '@parcely/core';
 
 // ---------------------------------------------------------------------------
 // Mock Client factory (same pattern as auth-token)

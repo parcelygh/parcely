@@ -8,7 +8,7 @@ title: createClient
 Creates a new HTTP client instance with the given default configuration.
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient(defaults?: RequestConfig): Client
 ```
@@ -26,7 +26,7 @@ A [`Client`](/docs/reference/client) instance.
 ## Example
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({
   baseURL: 'https://api.example.com',

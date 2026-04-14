@@ -12,7 +12,7 @@ Upload a large file from disk in Node.js using a readable stream, without loadin
 ## Smallest working example
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { createReadStream } from 'node:fs'
 
 const http = createClient({ baseURL: 'https://api.example.com' })

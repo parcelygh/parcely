@@ -8,7 +8,7 @@ title: HttpError
 An error class thrown for all request failures. Extends `Error`.
 
 ```ts
-import { HttpError, isHttpError } from 'parcely'
+import { HttpError, isHttpError } from '@parcely/core'
 ```
 
 ## Class definition
@@ -31,7 +31,7 @@ class HttpError extends Error {
 `HttpError.toJSON()` returns a `HttpErrorJSON` object that `JSON.stringify` produces automatically. Unlike the live error, this is guaranteed safe to serialise: `Headers` instances are flattened to `Record<string, string>`, `cause` is reduced to `{ name, message, code }` (no circular-reference throws), and `response` contains only primitives.
 
 ```ts
-import type { HttpErrorJSON } from 'parcely'
+import type { HttpErrorJSON } from '@parcely/core'
 
 try {
   await http.get('/u')
@@ -82,7 +82,7 @@ Returns `true` if the value is an instance of `HttpError`.
 ## Example
 
 ```ts
-import { createClient, isHttpError } from 'parcely'
+import { createClient, isHttpError } from '@parcely/core'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 

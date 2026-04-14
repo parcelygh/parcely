@@ -12,7 +12,7 @@ Validate API responses at runtime using ArkType, a TypeScript-native validator.
 ## Smallest working example
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 import { type } from 'arktype'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
@@ -35,7 +35,7 @@ ArkType 2+ implements Standard Schema v1, so it works with parcely's `validate` 
 ## Error handling
 
 ```ts
-import { isHttpError } from 'parcely'
+import { isHttpError } from '@parcely/core'
 
 try {
   await http.get('/users/me', { validate: User })

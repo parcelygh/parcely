@@ -5,8 +5,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createAuthRedirect } from './index.js';
 import type { AuthRedirectOptions } from './index.js';
-import { HttpError } from 'parcely';
-import type { RequestConfig } from 'parcely';
+import { HttpError } from '@parcely/core';
+import type { RequestConfig } from '@parcely/core';
 
 // ---- Helpers ---------------------------------------------------------------
 
@@ -298,7 +298,7 @@ describe('createAuthRedirect', () => {
       interceptors: {
         response: { use: useSpy },
       },
-    } as unknown as import('parcely').Client;
+    } as unknown as import('@parcely/core').Client;
 
     const redirect = createAuthRedirect({ loginUrl: '/login' });
     redirect.install(fakeClient);

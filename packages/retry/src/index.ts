@@ -7,7 +7,7 @@ import type {
   InterceptorHandler,
   RequestConfig,
   HttpResponse,
-} from 'parcely';
+} from '@parcely/core';
 
 import { computeDelay, parseRetryAfter, sleep } from './backoff.js';
 
@@ -184,7 +184,7 @@ const DEFAULT_METHODS = ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE'];
  * @example
  * ```ts
  * import { createRetry } from '@parcely/retry';
- * import { createClient } from 'parcely';
+ * import { createClient } from '@parcely/core';
  *
  * const http = createClient({ baseURL: 'https://api.example.com' });
  * const retry = createRetry({ count: 3 });

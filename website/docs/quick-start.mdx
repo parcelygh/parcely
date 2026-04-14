@@ -13,7 +13,7 @@ npm install parcely
 ## 2. Create a client
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({
   baseURL: 'https://api.example.com',
@@ -41,7 +41,7 @@ await http.delete('/users/1')
 ## 4. Handle errors
 
 ```ts
-import { isHttpError } from 'parcely'
+import { isHttpError } from '@parcely/core'
 
 try {
   await http.get('/might-fail')

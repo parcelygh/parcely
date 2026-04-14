@@ -39,7 +39,7 @@ const entryPath = join(tmpDir, 'entry.ts')
 writeFileSync(
   entryPath,
   [
-    `import { HttpError } from 'parcely'`,
+    `import { HttpError } from '@parcely/core'`,
     `export function touch(): HttpError {`,
     `  return new HttpError('x', { code: 'ERR_NETWORK', config: {} as never })`,
     `}`,
@@ -62,7 +62,7 @@ const result = await build({
   absWorkingDir: repoRoot,
   nodePaths: [join(repoRoot, 'node_modules')],
   alias: {
-    parcely: join(repoRoot, 'packages/parcely/dist/index.js'),
+    '@parcely/core': join(repoRoot, 'packages/parcely/dist/index.js'),
   },
   write: true,
   logLevel: 'warning',

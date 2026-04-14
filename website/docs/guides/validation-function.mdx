@@ -12,7 +12,7 @@ Validate API responses using a simple function without any schema library.
 ## Smallest working example
 
 ```ts
-import { createClient } from 'parcely'
+import { createClient } from '@parcely/core'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
@@ -45,7 +45,7 @@ parcely's `Validator<T>` type accepts `(input: unknown) => T` functions. The fun
 ## Error handling
 
 ```ts
-import { isHttpError } from 'parcely'
+import { isHttpError } from '@parcely/core'
 
 try {
   await http.get('/users/me', { validate: validateUser })

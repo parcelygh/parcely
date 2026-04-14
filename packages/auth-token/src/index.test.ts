@@ -5,7 +5,7 @@ import type {
   RequestConfig,
   HttpResponse,
   InterceptorHandler,
-} from 'parcely';
+} from '@parcely/core';
 
 // ---------------------------------------------------------------------------
 // Mock Client factory
