@@ -1,0 +1,40 @@
+{
+  "name": "@parcely/react",
+  "version": "0.1.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./tanstack": { "types": "./dist/tanstack/index.d.ts", "import": "./dist/tanstack/index.js" }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "README.md", "LICENSE"],
+  "publishConfig": { "access": "public" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "@parcely/core": "workspace:*",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": { "optional": true }
+  },
+  "devDependencies": {
+    "@parcely/core": "workspace:*",
+    "@tanstack/react-query": "^5",
+    "@testing-library/react": "^16",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "jsdom": "^26",
+    "react": "^19",
+    "react-dom": "^19",
+    "rimraf": "^6",
+    "typescript": "^6",
+    "vitest": "^3"
+  }
+}
