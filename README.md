@@ -30,12 +30,14 @@ try {
 
 | Package | Description |
 |---|---|
-| [`parcely`](./packages/parcely) | Core HTTP client. |
+| [`@parcely/core`](./packages/parcely) | Core HTTP client. |
 | [`@parcely/auth-token`](./packages/auth-token) | Bearer / API-key / Basic token interceptor with single-flight refresh-on-401. |
 | [`@parcely/auth-redirect`](./packages/auth-redirect) | Browser 401/403 → login redirect interceptor with `return_to` preservation and cooldown debounce. |
-| [`website`](./website) | Docusaurus documentation site — axios migration guide, how-tos, security pages, API reference. |
+| [`@parcely/retry`](./packages/retry) | Exponential-backoff retries with full jitter, `Retry-After` honoring, and AbortSignal-aware backoff. |
+| [`@parcely/react`](./packages/react) | React hooks (`useQuery`, `useSuspenseQuery`, `useMutation`) + TanStack Query adapter. |
+| [`website`](./website) | Documentation site at [parcely.cc](https://parcely.cc). |
 
-Reserved for future releases: `@parcely/retry`, `@parcely/react`, `@parcely/upload-node`.
+Reserved for future development: `@parcely/upload-node`.
 
 ## Documentation
 
