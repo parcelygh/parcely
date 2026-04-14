@@ -72,9 +72,9 @@ jobs:
           createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # NPM_TOKEN is required for pnpm publish auth. pnpm does not
-          # support npm's OIDC-based trusted publishing for authentication
-          # (only npm CLI does). The token authenticates; the OIDC token
-          # (via id-token: write) signs provenance attestations.
+          # setup-node writes ~/.npmrc with _authToken=${NODE_AUTH_TOKEN}.
+          # Both vars must be set so the token flows to both pnpm and npm.
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: "true"
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Provenance disabled until token-based publish is confirmed
+          # working. Re-enable with: NPM_CONFIG_PROVENANCE: "true"
