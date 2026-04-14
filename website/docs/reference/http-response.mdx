@@ -35,6 +35,7 @@ interface HttpResponse<T> {
 | `'text'` | `string` |
 | `'arraybuffer'` | `ArrayBuffer` |
 | `'blob'` | `Blob` |
+| `'stream'` | `ReadableStream<Uint8Array> \| null` — the un-consumed body stream. Validation is skipped for this mode. |
 
 ## Example
 

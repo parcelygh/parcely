@@ -53,10 +53,10 @@ const { data } = await http.get('/file', { responseType: 'arraybuffer' })
 const { data: d } = await http.get('/file', { responseType: 'arraybuffer' })
 ```
 
-Both libraries support `'json'`, `'text'`, `'arraybuffer'`, and `'blob'`. Axios additionally supports `'stream'` (Node) and `'document'` (browser DOM), which parcely does not provide.
+Both libraries support `'json'`, `'text'`, `'arraybuffer'`, and `'blob'`. parcely also supports `'stream'` (returns the un-consumed `ReadableStream` — see the [download streaming guide](./download-streaming.mdx)). Axios supports `'stream'` (Node `Readable`) and `'document'` (browser DOM); parcely does not provide `'document'`.
 
 ## Notes and gotchas
 
-- The `responseType` type is `'json' | 'text' | 'arraybuffer' | 'blob'`.
+- The `responseType` type is `'json' | 'text' | 'arraybuffer' | 'blob' | 'stream'`.
 - When `responseType` is `'json'` (default), parcely sniffs the `Content-Type` header. If it does not indicate JSON, the response is returned as text to avoid parse errors.
 - If JSON parsing fails even with a JSON content type, parcely throws `HttpError` with `code: 'ERR_PARSE'`.

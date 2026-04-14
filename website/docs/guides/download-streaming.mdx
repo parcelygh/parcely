@@ -9,34 +9,66 @@ title: Download streaming
 
 Consume a response body incrementally as a `ReadableStream` rather than buffering the entire response into memory.
 
-## Current status
+## Using `responseType: 'stream'`
 
-parcely v1 supports `responseType` values of `'json'`, `'text'`, `'arraybuffer'`, and `'blob'`. A `'stream'` response type that returns the raw `ReadableStream` is planned for a future release.
-
-## Workaround: download progress with blob
-
-For large downloads, use `onDownloadProgress` to track progress while downloading into a blob:
+parcely supports `responseType: 'stream'`, which returns the un-consumed `ReadableStream<Uint8Array> | null` as `data`. The body is NOT read or parsed — you consume it yourself.
 
 ```ts
 import { createClient } from '@parcely/core'
 
 const http = createClient({ baseURL: 'https://api.example.com' })
 
+const { data: stream } = await http.get('/large-file', {
+  responseType: 'stream',
+})
+
+if (stream) {
+  const reader = stream.getReader()
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    process.stdout.write(value) // or pipe to a file, transform, etc.
+  }
+}
+```
+
+When `responseType: 'stream'` is set:
+- `data` is `ReadableStream<Uint8Array> | null`
+- `validate` is silently skipped (you can't validate bytes before reading them)
+- `onDownloadProgress` still works if set — the stream is wrapped with progress tracking before being returned
+
+## Combining with download progress
+
+```ts
+const { data: stream } = await http.get('/large-file', {
+  responseType: 'stream',
+  onDownloadProgress: ({ loaded, total, percent }) => {
+    console.log(`Downloaded: ${loaded} bytes (${percent ?? '?'}%)`)
+  },
+})
+// stream is progress-wrapped — progress fires as you read from it
+```
+
+## Alternative: blob with progress
+
+If you don't need true streaming and just want progress visibility while downloading into memory:
+
+```ts
 const { data } = await http.get('/large-file', {
   responseType: 'blob',
   onDownloadProgress: ({ loaded, total, percent }) => {
     console.log(`Downloaded: ${loaded} bytes (${percent ?? '?'}%)`)
   },
 })
-// data is a Blob
+// data is a Blob — fully buffered in memory
 ```
 
 ## Axios equivalent
 
-Axios provides `responseType: 'stream'` in Node.js, which returns a Node `Readable`. parcely does not currently provide this. Use the `onDownloadProgress` callback for incremental tracking.
+Axios provides `responseType: 'stream'` in Node.js, which returns a Node `Readable`. parcely's `'stream'` returns a Web `ReadableStream` (the platform standard). In Node 20+, Web ReadableStreams are first-class and interoperate with `node:stream` via `Readable.fromWeb()`.
 
 ## Notes and gotchas
 
-- A `responseType: 'stream'` option is on the roadmap.
-- For very large files in Node, consider using the native `fetch` API directly with `response.body` (a Web `ReadableStream`) if you need true streaming.
-- The `onDownloadProgress` callback fires as chunks arrive, giving you incremental visibility even though the full response is buffered.
+- The `ReadableStream` is one-shot — once you read it, it's consumed. If you need to read the body twice, buffer it into a `Blob` or `ArrayBuffer` first.
+- `validate` is skipped for stream responses. If you need validation, read the stream into text/JSON yourself and validate manually.
+- In browsers, the stream comes from `response.body` which is universally supported in modern browsers.

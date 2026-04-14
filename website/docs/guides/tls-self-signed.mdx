@@ -26,7 +26,7 @@ const { data } = await http.get('/health')
 
 ## How it works
 
-When `tls` is set, parcely lazy-imports `undici` (built into Node 20+) and creates a custom `Agent` with the specified TLS options. This is passed to `fetch` as a dispatcher.
+When `tls` is set, parcely lazy-imports `undici` (installed via `optionalDependencies`) and creates a custom `Agent` with the specified TLS options. This is passed to `fetch` as a dispatcher.
 
 ## Axios equivalent
 

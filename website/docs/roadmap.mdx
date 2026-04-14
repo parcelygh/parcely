@@ -5,21 +5,37 @@ title: Roadmap
 
 # Roadmap
 
-parcely is structured as a monorepo with reserved slots for future subpackages. These are intentionally not built in v1 so the core stays small and focused.
+parcely is structured as a monorepo. Some addon packages have shipped; others are reserved for future development.
 
-## Reserved subpackage slots
+## Shipped addon packages
 
 ### `@parcely/retry`
 
-Interceptor-based retry policies with exponential backoff, jitter, and configurable retry conditions.
+Exponential-backoff retries with full jitter, `Retry-After` honoring, `AbortSignal`-aware backoff sleep, and idempotent-methods-by-default safety.
 
-**Status:** Planned. In the meantime, see the [retries with backoff guide](/docs/guides/retries-with-backoff) for an interceptor recipe.
+**Status:** Shipped (0.1.0). See the [retries guide](/docs/guides/retries-with-backoff) and [`@parcely/retry` reference](/docs/reference/retry).
+
+### `@parcely/auth-token`
+
+Bearer / API-key / Basic token interceptor with single-flight refresh-on-401.
+
+**Status:** Shipped (0.1.0). See the [`@parcely/auth-token` reference](/docs/reference/auth-token).
+
+### `@parcely/auth-redirect`
+
+Browser 401/403 → login redirect interceptor with `return_to` preservation and cooldown debounce.
+
+**Status:** Shipped (0.1.0). See the [`@parcely/auth-redirect` reference](/docs/reference/auth-redirect).
+
+## In progress
 
 ### `@parcely/react`
 
-React hooks for data fetching: `useHttp()`, SWR-like caching, and TanStack Query integration helpers.
+React hooks (`useQuery`, `useSuspenseQuery`, `useMutation`) and a TanStack Query adapter.
 
-**Status:** Planned. In the meantime, see the [React usage guide](/docs/guides/react-usage) for custom hook patterns.
+**Status:** In development.
+
+## Reserved subpackage slots
 
 ### `@parcely/upload-node`
 
@@ -29,11 +45,11 @@ Node-specific upload utilities: file-path convenience helpers (`uploadFile('./bi
 
 ## Future considerations
 
-- `responseType: 'stream'` for true streaming response consumption
 - Host allowlists/blocklists for additional SSRF protection
 - Request/response size limits
 - mTLS / client certificate support
 - Minimum TLS version configuration
+- SWR adapter (`@parcely/react/swr`)
 
 ## Contributing
 

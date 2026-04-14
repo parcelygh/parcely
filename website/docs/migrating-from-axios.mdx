@@ -417,7 +417,7 @@ const { data } = await http.get('/file', { responseType: 'arraybuffer' })
 </TabItem>
 </Tabs>
 
-parcely supports `'json'` (default), `'text'`, `'arraybuffer'`, and `'blob'`. The axios `'stream'` and `'document'` types are not provided.
+parcely supports `'json'` (default), `'text'`, `'arraybuffer'`, `'blob'`, and `'stream'` (returns the un-consumed Web `ReadableStream`). Axios `'document'` (browser DOM parsing) is not provided. Axios `'stream'` returns a Node `Readable`; parcely `'stream'` returns a Web `ReadableStream` — use `Readable.fromWeb()` if you need the Node form.
 
 ## Runtime validation (new in parcely)
 
@@ -448,7 +448,7 @@ Validators can be Zod schemas, Valibot schemas, ArkType types, objects with a `.
 | `data` | `body` (second argument to `.post()`, `.put()`, `.patch()`) | Renamed to `body` in the config object. Method helpers accept it as the second positional argument. |
 | `timeout` | `timeout` | Milliseconds. Combined with user `signal` via `AbortSignal.any`. |
 | `signal` | `signal` | Standard `AbortSignal`. |
-| `responseType` | `responseType` | `'json'` \| `'text'` \| `'arraybuffer'` \| `'blob'`. No `'stream'` or `'document'`. |
+| `responseType` | `responseType` | `'json'` \| `'text'` \| `'arraybuffer'` \| `'blob'` \| `'stream'` (Web ReadableStream). No `'document'`. |
 | `maxRedirects` | `maxRedirects` | Default 5. Manual redirect loop with cross-origin header stripping. |
 | `onUploadProgress` | `onUploadProgress` | `(event: ProgressEvent) => void` where `ProgressEvent = { loaded, total?, percent? }`. |
 | `onDownloadProgress` | `onDownloadProgress` | Same shape as upload progress. |

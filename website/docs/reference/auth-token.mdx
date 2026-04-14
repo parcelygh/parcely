@@ -19,27 +19,30 @@ Creates an auth-token handler that can be installed on a client.
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `scheme` | `string` | `'Bearer'` | The auth scheme prefix: `'Bearer'`, `'Basic'`, `'Token'`, or any custom string. |
-| `getToken` | `() => Promise<string \| null \| undefined>` | (required) | Async function that returns the current token. Called on every request. |
+| `scheme` | `string` | `'Bearer'` | The auth scheme prefix: `'Bearer'`, `'Basic'`, `'Token'`, or any custom string. Use `''` for raw token. |
+| `getToken` | `() => string \| null \| Promise<string \| null>` | (required) | Returns the current token. May be sync or async. When `null`, the header is not set (unauthenticated request passes through). |
 | `header` | `string` | `'Authorization'` | The header name to set. Can be `'X-API-Key'` or any custom header. |
-| `refreshOn` | `number[]` | `[]` | HTTP status codes that trigger a token refresh (e.g., `[401]`). |
-| `refresh` | `() => Promise<string>` | `undefined` | Async function that refreshes the token and returns the new token. Required if `refreshOn` is set. |
+| `refreshOn` | `number[]` | `[401]` | HTTP status codes that trigger a token refresh. Only relevant when `refresh` is provided. |
+| `refresh` | `() => Promise<string>` | `undefined` | Async function that refreshes the token and returns the new token. When omitted, errors matching `refreshOn` propagate as-is. |
 
 ### Return value
 
 ```ts
 {
-  request: InterceptorHandler<RequestConfig>
-  response: InterceptorHandler<HttpResponse<unknown>>[]
+  request: (config: RequestConfig) => RequestConfig | Promise<RequestConfig>
+  response: {
+    fulfilled?: (res: HttpResponse<unknown>) => HttpResponse<unknown> | Promise<HttpResponse<unknown>>
+    rejected?: (err: unknown) => unknown
+  }
   install(client: Client): void
 }
 ```
 
 | Property | Description |
 |---|---|
-| `request` | A request interceptor handler that attaches the token. |
-| `response` | A response interceptor handler (array) for refresh logic. |
-| `install(client)` | Convenience method that wires both request and response interceptors onto the client. |
+| `request` | A request interceptor fulfilled handler that attaches the token. Skips when `_retry: true` is set on the config (preserves freshly-refreshed tokens). |
+| `response` | An object with optional `fulfilled` and `rejected` handlers for refresh logic. `rejected` intercepts errors matching `refreshOn` statuses. |
+| `install(client)` | Convenience method that wires both request and response interceptors onto the client. Required for refresh-then-retry to work (captures the client reference internally). |
 
 ## Key behaviour
 
@@ -76,9 +79,7 @@ auth.install(http)
 
 ```ts
 http.interceptors.request.use(auth.request)
-for (const handler of auth.response) {
-  http.interceptors.response.use(handler)
-}
+http.interceptors.response.use(auth.response.fulfilled, auth.response.rejected)
 ```
 
 ## See also

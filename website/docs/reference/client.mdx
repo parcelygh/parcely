@@ -16,16 +16,20 @@ interface Client {
     response: InterceptorManager<HttpResponse<unknown>>
   }
 
+  // Each method has two overloads:
+  // 1. Validating — when config.validate is provided, data is inferred from the validator
+  // 2. Generic — explicit <T>, or unknown when omitted
+
+  request<V extends Validator<unknown>>(config: RequestConfig & { validate: V }): Promise<HttpResponse<ValidatorOutput<V>>>
   request<T>(config: RequestConfig): Promise<HttpResponse<T>>
 
+  get<V extends Validator<unknown>>(url: string, config: RequestConfig & { validate: V }): Promise<HttpResponse<ValidatorOutput<V>>>
   get<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>
-  delete<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>
-  head<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>
-  options<T>(url: string, config?: RequestConfig): Promise<HttpResponse<T>>
+  // delete, head, options — same pattern
 
+  post<V extends Validator<unknown>, B = unknown>(url: string, body: B | undefined, config: RequestConfig & { validate: V }): Promise<HttpResponse<ValidatorOutput<V>>>
   post<T, B = unknown>(url: string, body?: B, config?: RequestConfig): Promise<HttpResponse<T>>
-  put<T, B = unknown>(url: string, body?: B, config?: RequestConfig): Promise<HttpResponse<T>>
-  patch<T, B = unknown>(url: string, body?: B, config?: RequestConfig): Promise<HttpResponse<T>>
+  // put, patch — same pattern
 }
 ```
 

@@ -15,7 +15,7 @@ title: Introduction
 - **Tree-shakeable.** Named exports only, `sideEffects: false`, conditional dynamic import for TLS. Ship only what you use.
 - **Universal runtime.** Targets modern browsers, Node 20+, Bun, and Deno.
 - **Validator extension point.** Opt-in runtime response validation via Standard Schema (Zod, Valibot, ArkType) or any `(input) => T` function. No validator runtime dependency.
-- **Monorepo from day one.** Core stays small. Companion subpackages (`@parcely/auth-token`, `@parcely/auth-redirect`) handle common auth patterns; further slots (retry, react, upload-node) are reserved for the future.
+- **Monorepo from day one.** Core stays small. Companion packages handle common patterns: `@parcely/auth-token` (bearer/refresh), `@parcely/auth-redirect` (browser login redirect), `@parcely/retry` (exponential backoff). Further slots (react, upload-node) are in development or reserved.
 
 ## What it looks like
 

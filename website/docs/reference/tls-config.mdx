@@ -23,7 +23,7 @@ interface TlsConfig {
 
 ## How it works
 
-When `tls` is set in `RequestConfig`, parcely lazy-imports `undici` (built into Node 20+) and creates a custom `Agent` with the specified TLS options. This agent is passed to `fetch` as a dispatcher.
+When `tls` is set in `RequestConfig`, parcely lazy-imports `undici` (installed via `optionalDependencies`) and creates a custom `Agent` with the specified TLS options. This agent is passed to `fetch` as a dispatcher.
 
 ## Example
 

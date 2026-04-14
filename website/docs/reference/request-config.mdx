@@ -59,7 +59,7 @@ interface RequestConfig {
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `responseType` | `ResponseType` | `'json'` | How the response body is parsed: `'json'`, `'text'`, `'arraybuffer'`, or `'blob'`. |
+| `responseType` | `ResponseType` | `'json'` | How the response body is parsed: `'json'`, `'text'`, `'arraybuffer'`, , `'blob'`, or `'stream'` (returns the un-consumed `ReadableStream`). |
 | `validate` | `Validator<unknown>` | `undefined` | Runtime response validator. Accepts Standard Schema v1, `{ parse(input): T }`, or `(input) => T`. |
 
 ### Timing and cancellation
@@ -113,7 +113,7 @@ interface ProgressEvent {
 
 ```ts
 type HeadersInit = Record<string, string> | [string, string][] | Headers
-type ResponseType = 'json' | 'text' | 'arraybuffer' | 'blob'
+type ResponseType = 'json' | 'text' | 'arraybuffer' | 'blob' | 'stream'
 type FormDataSerializer = 'brackets' | 'indices' | 'repeat'
 ```
 
