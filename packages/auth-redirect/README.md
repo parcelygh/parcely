@@ -3,7 +3,7 @@
 Browser-side login-redirect interceptor for [`parcely`](https://www.npmjs.com/package/parcely). On `401` / `403`, redirects to a login URL — with optional `return_to` preservation, a `shouldRedirect` predicate, and cooldown debounce to prevent redirect storms.
 
 ```sh
-npm install parcely @parcely/auth-redirect
+npm install @parcely/core @parcely/auth-redirect
 ```
 
 ```ts

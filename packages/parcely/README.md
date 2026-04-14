@@ -3,7 +3,7 @@
 Zero-dependency, fetch-based HTTP client with axios-like ergonomics and a secure-by-default posture.
 
 ```sh
-npm install parcely
+npm install @parcely/core
 # if you plan to use tls customization on Node:
 npm install undici
 ```

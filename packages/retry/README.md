@@ -3,7 +3,7 @@
 Exponential-backoff retry interceptor for [`parcely`](https://www.npmjs.com/package/parcely). Supports full jitter, `Retry-After` header parsing (integer + HTTP-date), idempotent-methods-by-default safety, and AbortSignal-aware sleep.
 
 ```sh
-npm install parcely @parcely/retry
+npm install @parcely/core @parcely/retry
 ```
 
 ```ts

@@ -3,7 +3,7 @@
 Bearer / API-key / Basic token interceptor for [`parcely`](https://www.npmjs.com/package/parcely). Supports single-flight refresh-on-401 coalescing with bounded retry.
 
 ```sh
-npm install parcely @parcely/auth-token
+npm install @parcely/core @parcely/auth-token
 ```
 
 ```ts

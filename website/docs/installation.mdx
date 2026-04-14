@@ -13,21 +13,21 @@ import TabItem from '@theme/TabItem';
 <TabItem value="npm" label="npm">
 
 ```bash
-npm install parcely
+npm install @parcely/core
 ```
 
 </TabItem>
 <TabItem value="pnpm" label="pnpm">
 
 ```bash
-pnpm add parcely
+pnpm add @parcely/core
 ```
 
 </TabItem>
 <TabItem value="yarn" label="yarn">
 
 ```bash
-yarn add parcely
+yarn add @parcely/core
 ```
 
 </TabItem>
@@ -97,7 +97,7 @@ You have three options:
 ```js
 // index.js (CommonJS)
 async function main() {
-  const { createClient } = await import('parcely')
+  const { createClient } = await import('@parcely/core')
   const http = createClient({ baseURL: 'https://api.example.com' })
   // ...
 }
