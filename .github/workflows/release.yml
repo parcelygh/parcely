@@ -72,11 +72,9 @@ jobs:
           createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # No NPM_TOKEN — trusted publishing is configured for all
-          # @parcely packages. The OIDC token from GitHub Actions (via
-          # the `id-token: write` permission above) authenticates with
-          # npm directly. If you ever need to fall back to token auth,
-          # add `NPM_TOKEN: ${{ secrets.NPM_TOKEN }}` here.
-          #
-          # Provenance attestations are also powered by the OIDC token:
+          # NPM_TOKEN is required for pnpm publish auth. pnpm does not
+          # support npm's OIDC-based trusted publishing for authentication
+          # (only npm CLI does). The token authenticates; the OIDC token
+          # (via id-token: write) signs provenance attestations.
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
