@@ -1,6 +1,6 @@
 {
   "name": "@parcely/auth-token",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Bearer / API-key / Basic token interceptor for parcely, with single-flight refresh-on-401 coalescing.",
   "license": "MIT",
   "keywords": [
